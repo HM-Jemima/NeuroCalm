@@ -68,12 +68,16 @@ export function useAnalysis() {
       setAnalyzing(true);
       setProgress(0);
 
-      for (let i = 0; i <= 100; i += 10) {
-        await new Promise((r) => setTimeout(r, 200));
-        setProgress(i);
+      // Simulate realistic analysis pipeline with variable step durations
+      const steps = [5, 12, 20, 30, 42, 55, 65, 78, 88, 95, 100];
+      for (const pct of steps) {
+        // Variable delay: slower in the middle (ML processing), faster at start/end
+        const delay = pct > 40 && pct < 80 ? 400 + Math.random() * 300 : 200 + Math.random() * 200;
+        await new Promise((r) => setTimeout(r, delay));
+        setProgress(pct);
       }
 
-      await new Promise((r) => setTimeout(r, 800));
+      await new Promise((r) => setTimeout(r, 500));
 
       const score = Math.floor(Math.random() * 80) + 10;
       const result = {
