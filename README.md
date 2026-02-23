@@ -337,9 +337,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Project Maintainer**: Your Name
 
-- Email: your.email@example.com
-- Twitter: [@yourhandle](https://twitter.com/yourhandle)
-- LinkedIn: [Your Profile](https://linkedin.com/in/yourprofile)
+- Email: hmjemima@gmail.com
+- LinkedIn: [Your Profile](https://www.linkedin.com/in/h-m-jemima-288563302/)
 
 ---
 
