@@ -1,8 +1,25 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, FileText, X } from 'lucide-react';
+import { Upload, FileText, X, Brain, Zap, BarChart3, CheckCircle } from 'lucide-react';
 import Button from '../common/Button';
 import { isValidFile, formatFileSize } from '../../utils/helpers';
+
+const analysisSteps = [
+  { label: 'Uploading file...', icon: Upload, threshold: 10 },
+  { label: 'Preprocessing EEG signal...', icon: Zap, threshold: 25 },
+  { label: 'Removing artifacts & noise...', icon: Zap, threshold: 40 },
+  { label: 'Extracting band power features...', icon: BarChart3, threshold: 55 },
+  { label: 'Running ML classification model...', icon: Brain, threshold: 75 },
+  { label: 'Generating stress report...', icon: FileText, threshold: 90 },
+  { label: 'Analysis complete!', icon: CheckCircle, threshold: 100 },
+];
+
+function getCurrentStep(progress) {
+  for (let i = analysisSteps.length - 1; i >= 0; i--) {
+    if (progress >= analysisSteps[i].threshold) return analysisSteps[i];
+  }
+  return analysisSteps[0];
+}
 
 export default function UploadZone({ onAnalyze, isAnalyzing, uploadProgress }) {
   const [isDragOver, setIsDragOver] = useState(false);
@@ -45,10 +62,100 @@ export default function UploadZone({ onAnalyze, isAnalyzing, uploadProgress }) {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  const currentStep = getCurrentStep(uploadProgress);
+
   return (
     <div className="w-full">
       <AnimatePresence mode="wait">
-        {!selectedFile ? (
+        {isAnalyzing ? (
+          /* Analyzing State */
+          <motion.div
+            key="analyzing"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="border border-border-color rounded-2xl p-8"
+          >
+            {/* Animated brain icon */}
+            <div className="flex flex-col items-center mb-6">
+              <motion.div
+                className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent-blue to-accent-purple flex items-center justify-center mb-4"
+                animate={{ scale: [1, 1.08, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <Brain size={28} className="text-white" />
+              </motion.div>
+              <motion.p
+                key={currentStep.label}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-sm font-semibold text-text-primary"
+              >
+                {currentStep.label}
+              </motion.p>
+              <p className="text-xs text-text-muted mt-1">
+                {selectedFile?.name}
+              </p>
+            </div>
+
+            {/* Progress bar */}
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs text-text-secondary">Processing</span>
+                <span className="text-xs text-accent-blue font-semibold">{uploadProgress}%</span>
+              </div>
+              <div className="w-full h-2.5 bg-bg-glass rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-gradient-to-r from-accent-blue to-accent-purple rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${uploadProgress}%` }}
+                  transition={{ duration: 0.3 }}
+                />
+              </div>
+            </div>
+
+            {/* Step indicators */}
+            <div className="space-y-2">
+              {analysisSteps.slice(0, -1).map((step) => {
+                const done = uploadProgress >= step.threshold;
+                const active = currentStep.label === step.label;
+                return (
+                  <div key={step.label} className="flex items-center gap-3">
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${
+                      done
+                        ? 'bg-accent-green/10'
+                        : active
+                        ? 'bg-accent-blue/10'
+                        : 'bg-bg-glass'
+                    }`}>
+                      {done ? (
+                        <CheckCircle size={12} className="text-accent-green" />
+                      ) : (
+                        <step.icon size={10} className={active ? 'text-accent-blue' : 'text-text-muted'} />
+                      )}
+                    </div>
+                    <span className={`text-xs ${
+                      done
+                        ? 'text-accent-green'
+                        : active
+                        ? 'text-text-primary font-medium'
+                        : 'text-text-muted'
+                    }`}>
+                      {step.label}
+                    </span>
+                    {active && !done && (
+                      <motion.div
+                        className="w-1.5 h-1.5 rounded-full bg-accent-blue"
+                        animate={{ opacity: [1, 0.3, 1] }}
+                        transition={{ duration: 0.8, repeat: Infinity }}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </motion.div>
+        ) : !selectedFile ? (
           <motion.div
             key="dropzone"
             initial={{ opacity: 0 }}
@@ -121,30 +228,13 @@ export default function UploadZone({ onAnalyze, isAnalyzing, uploadProgress }) {
               </button>
             </div>
 
-            {isAnalyzing && (
-              <div className="mb-4">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs text-text-secondary">Analyzing...</span>
-                  <span className="text-xs text-accent-blue font-semibold">{uploadProgress}%</span>
-                </div>
-                <div className="w-full h-2 bg-bg-glass rounded-full overflow-hidden">
-                  <motion.div
-                    className="h-full bg-gradient-to-r from-accent-blue to-accent-purple rounded-full"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${uploadProgress}%` }}
-                    transition={{ duration: 0.3 }}
-                  />
-                </div>
-              </div>
-            )}
-
             <Button
               variant="success"
               fullWidth
               onClick={() => onAnalyze(selectedFile)}
               disabled={isAnalyzing}
             >
-              {isAnalyzing ? 'Analyzing...' : 'Analyze Stress Level'}
+              Analyze Stress Level
             </Button>
           </motion.div>
         )}

@@ -8,12 +8,16 @@ import Avatar from '../../components/common/Avatar';
 import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
 import StatsCard from '../../components/dashboard/StatsCard';
+import UploadZone from '../../components/dashboard/UploadZone';
+import AnalysisResult from '../../components/dashboard/AnalysisResult';
+import BandPowerChart from '../../components/dashboard/BandPowerChart';
 import UsersTable from '../../components/admin/UsersTable';
 import SystemStats from '../../components/admin/SystemStats';
 import ActivityFeed from '../../components/admin/ActivityFeed';
 import ModelInfo from '../../components/admin/ModelInfo';
 import useAuthStore from '../../store/authStore';
 import { useAdmin } from '../../hooks/useAdmin';
+import { useAnalysis } from '../../hooks/useAnalysis';
 
 const adminNav = [
   { label: 'Dashboard', icon: Home, path: '/admin' },
@@ -38,6 +42,13 @@ const fadeUp = { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 } }
 export default function AdminDashboard() {
   const { user, logout } = useAuthStore();
   const { stats, users, modelInfo, deleteUser } = useAdmin();
+  const {
+    currentAnalysis,
+    isAnalyzing,
+    uploadProgress,
+    uploadAndAnalyze,
+    clearAnalysis,
+  } = useAnalysis();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -152,6 +163,50 @@ export default function AdminDashboard() {
           <motion.div variants={fadeUp} className="grid grid-cols-[1fr_400px] gap-6">
             {/* Left Column */}
             <div className="space-y-6">
+              {/* Upload Zone */}
+              <Card hover={false}>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold font-display text-text-primary">
+                    Quick Analysis
+                  </h3>
+                  {currentAnalysis && (
+                    <button
+                      onClick={clearAnalysis}
+                      className="text-sm text-accent-blue hover:underline"
+                    >
+                      New Upload
+                    </button>
+                  )}
+                </div>
+                <UploadZone
+                  onAnalyze={uploadAndAnalyze}
+                  isAnalyzing={isAnalyzing}
+                  uploadProgress={uploadProgress}
+                />
+              </Card>
+
+              {/* Analysis Result (shown after upload) */}
+              {currentAnalysis && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="grid grid-cols-2 gap-4"
+                >
+                  <Card hover={false}>
+                    <h3 className="text-sm font-semibold font-display text-text-primary mb-4">
+                      Stress Detection
+                    </h3>
+                    <AnalysisResult result={currentAnalysis} />
+                  </Card>
+                  <Card hover={false}>
+                    <h3 className="text-sm font-semibold font-display text-text-primary mb-4">
+                      Band Power
+                    </h3>
+                    <BandPowerChart bandPowers={currentAnalysis.band_powers} />
+                  </Card>
+                </motion.div>
+              )}
+
               <Card hover={false}>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold font-display text-text-primary">Users</h3>
