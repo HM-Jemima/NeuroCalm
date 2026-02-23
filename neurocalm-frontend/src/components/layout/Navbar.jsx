@@ -1,20 +1,37 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Brain } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Button from '../common/Button';
 import useAuthStore from '../../store/authStore';
 
 const navLinks = [
-  { label: 'Features', href: '#features' },
-  { label: 'How It Works', href: '#how-it-works' },
-  { label: 'Pricing', href: '#pricing' },
-  { label: 'Research', href: '#research' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Features', hash: '#features' },
+  { label: 'How It Works', hash: '#how-it-works' },
+  { label: 'Pricing', to: '/pricing' },
+  { label: 'Research', to: '/research' },
+  { label: 'Contact', to: '/contact' },
 ];
 
 export default function Navbar() {
   const { isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleHashClick = (e, hash) => {
+    e.preventDefault();
+    if (location.pathname === '/') {
+      // Already on landing page — just scroll
+      const el = document.querySelector(hash);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      // Navigate to landing page, then scroll after a short delay
+      navigate('/');
+      setTimeout(() => {
+        const el = document.querySelector(hash);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  };
 
   return (
     <motion.nav
@@ -35,15 +52,26 @@ export default function Navbar() {
 
         {/* Nav Links */}
         <div className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="text-sm text-text-secondary hover:text-text-primary transition-colors"
-            >
-              {link.label}
-            </a>
-          ))}
+          {navLinks.map((link) =>
+            link.to ? (
+              <Link
+                key={link.label}
+                to={link.to}
+                className="text-sm text-text-secondary hover:text-text-primary transition-colors"
+              >
+                {link.label}
+              </Link>
+            ) : (
+              <a
+                key={link.label}
+                href={link.hash}
+                onClick={(e) => handleHashClick(e, link.hash)}
+                className="text-sm text-text-secondary hover:text-text-primary transition-colors"
+              >
+                {link.label}
+              </a>
+            )
+          )}
         </div>
 
         {/* Auth Buttons */}

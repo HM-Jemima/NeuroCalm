@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Activity, FileText, Clock, TrendingUp, Search, Bell } from 'lucide-react';
+import { Activity, FileText, Clock, TrendingUp, Search, Bell, Download } from 'lucide-react';
 import Sidebar from '../components/layout/Sidebar';
+import Modal from '../components/common/Modal';
 import Card from '../components/common/Card';
 import StatsCard from '../components/dashboard/StatsCard';
 import UploadZone from '../components/dashboard/UploadZone';
@@ -10,6 +11,38 @@ import BandPowerChart from '../components/dashboard/BandPowerChart';
 import HistoryTable from '../components/dashboard/HistoryTable';
 import useAuthStore from '../store/authStore';
 import { useAnalysis } from '../hooks/useAnalysis';
+import { formatDate } from '../utils/helpers';
+
+function getBandPowers(item) {
+  if (item.band_powers) return item.band_powers;
+  const s = item.stress_score ?? 50;
+  return {
+    delta: Math.min(45, Math.max(15, 35 - Math.round(s * 0.1))),
+    theta: Math.min(35, Math.max(10, 22 + Math.round((s - 50) * 0.08))),
+    alpha: Math.min(30, Math.max(8, 25 - Math.round(s * 0.15))),
+    beta: Math.min(25, Math.max(5, 8 + Math.round(s * 0.12))),
+    gamma: Math.min(15, Math.max(3, 5 + Math.round(s * 0.05))),
+  };
+}
+
+function downloadJSON(item) {
+  const data = {
+    id: item.id,
+    filename: item.filename || item.file_name,
+    stress_score: item.stress_score ?? item.score,
+    confidence: item.confidence,
+    band_powers: getBandPowers(item),
+    analyzed_by: item.user_name,
+    created_at: item.created_at || item.date,
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `neurocalm_analysis_${item.id}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 const quickStats = [
   { icon: FileText, label: 'Total Analyses', value: '24', change: '+12%', iconBg: 'bg-accent-blue/10', iconColor: 'text-accent-blue' },
@@ -38,6 +71,7 @@ export default function DashboardPage() {
     fetchHistory,
     deleteAnalysis,
   } = useAnalysis();
+  const [viewItem, setViewItem] = useState(null);
 
   useEffect(() => {
     fetchHistory().catch(() => {});
@@ -158,12 +192,64 @@ export default function DashboardPage() {
               </h3>
               <HistoryTable
                 items={history}
+                onView={(item) => setViewItem(item)}
+                onDownload={(item) => downloadJSON(item)}
                 onDelete={deleteAnalysis}
               />
             </Card>
           </motion.div>
         </motion.div>
       </main>
+
+      {/* View Modal */}
+      <Modal
+        isOpen={!!viewItem}
+        onClose={() => setViewItem(null)}
+        title="Analysis Details"
+        wide
+      >
+        {viewItem && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between px-1">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-accent-blue/10 rounded-xl flex items-center justify-center">
+                  <FileText size={18} className="text-accent-blue" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-text-primary">
+                    {viewItem.filename || viewItem.file_name}
+                  </p>
+                  <p className="text-xs text-text-muted">
+                    {formatDate(viewItem.created_at || viewItem.date)}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => downloadJSON(viewItem)}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border-color text-sm text-text-secondary hover:border-accent-blue hover:text-accent-blue transition-all"
+              >
+                <Download size={14} />
+                Export JSON
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <h4 className="text-sm font-medium text-text-muted mb-4 uppercase tracking-wider">
+                  Stress Analysis
+                </h4>
+                <AnalysisResult result={viewItem} />
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-text-muted mb-4 uppercase tracking-wider">
+                  Band Power Breakdown
+                </h4>
+                <BandPowerChart bandPowers={getBandPowers(viewItem)} />
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

@@ -12,9 +12,17 @@ import NewAnalysisPage from './pages/NewAnalysisPage';
 import HistoryPage from './pages/HistoryPage';
 import ReportsPage from './pages/ReportsPage';
 import SettingsPage from './pages/SettingsPage';
+import HelpPage from './pages/HelpPage';
+import PricingPage from './pages/PricingPage';
+import ResearchPage from './pages/ResearchPage';
+import ContactPage from './pages/ContactPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
+import AdminAnalyses from './pages/admin/AdminAnalyses';
+import AdminModel from './pages/admin/AdminModel';
+import AdminServer from './pages/admin/AdminServer';
+import AdminSettings from './pages/admin/AdminSettings';
 
 function AppContent() {
   const { isLoading } = useAuth();
@@ -33,6 +41,9 @@ function AppContent() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+      <Route path="/pricing" element={<PricingPage />} />
+      <Route path="/research" element={<ResearchPage />} />
+      <Route path="/contact" element={<ContactPage />} />
 
       {/* Protected Routes */}
       <Route element={<ProtectedRoute />}>
@@ -41,6 +52,7 @@ function AppContent() {
         <Route path="/history" element={<HistoryPage />} />
         <Route path="/reports" element={<ReportsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/help" element={<HelpPage />} />
       </Route>
 
       {/* Admin Routes */}
@@ -48,6 +60,10 @@ function AppContent() {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/users" element={<AdminUsers />} />
         <Route path="/admin/analytics" element={<AdminAnalytics />} />
+        <Route path="/admin/analyses" element={<AdminAnalyses />} />
+        <Route path="/admin/model" element={<AdminModel />} />
+        <Route path="/admin/server" element={<AdminServer />} />
+        <Route path="/admin/settings" element={<AdminSettings />} />
       </Route>
 
       {/* Fallback */}
