@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mv \"1_SALIENT_Fast.ipynb\" \"1_SALIENT_Final.ipynb\")",
+      "Bash(mv \"2_CNN_LSTM_Fast.ipynb\" \"2_CNN_LSTM_Final.ipynb\")",
+      "Bash(mv \"3_Transformer_Fast.ipynb\" \"3_Transformer_Final.ipynb\")",
+      "WebSearch",
+      "WebFetch(domain:tufts-hci-lab.github.io)",
+      "WebFetch(domain:arxiv.org)",
+      "WebFetch(domain:www.mdpi.com)",
+      "WebFetch(domain:openreview.net)",
+      "WebFetch(domain:ar5iv.labs.arxiv.org)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:paperswithcode.com)",
+      "WebFetch(domain:www.frontiersin.org)"
+    ]
+  }
+}
