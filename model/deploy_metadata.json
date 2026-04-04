@@ -1,0 +1,20 @@
+{
+  "model_type": "SALIENT",
+  "version": "v1.0.0-lite",
+  "accuracy": "32.11%",
+  "f1_score": "32.05%",
+  "kappa": 0.0948,
+  "feature_cols": [
+    "AB_I_O",
+    "AB_PHI_O",
+    "AB_I_DO",
+    "AB_PHI_DO",
+    "CD_I_O",
+    "CD_PHI_O",
+    "CD_I_DO",
+    "CD_PHI_DO"
+  ],
+  "timesteps": 150,
+  "n_channels": 8,
+  "n_classes": 4
+}
