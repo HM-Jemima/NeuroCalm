@@ -1,9 +1,16 @@
-from pydantic_settings import BaseSettings
 from functools import lru_cache
+from urllib.parse import quote_plus
+
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/neurocalm"
+    DATABASE_URL: str | None = None
+    POSTGRES_HOST: str = "localhost"
+    POSTGRES_PORT: int = 5432
+    POSTGRES_DB: str = "neurocalm"
+    POSTGRES_USER: str = "postgres"
+    POSTGRES_PASSWORD: str = "postgres"
     SECRET_KEY: str = "change-this-to-a-random-secret-key-in-production"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
@@ -31,6 +38,21 @@ class Settings(BaseSettings):
     @property
     def fnirs_feature_list(self) -> list[str]:
         return [f.strip() for f in self.FNIRS_FEATURES.split(",")]
+
+    @property
+    def database_url(self) -> str:
+        if self.DATABASE_URL:
+            return self.DATABASE_URL
+
+        user = quote_plus(self.POSTGRES_USER)
+        password = quote_plus(self.POSTGRES_PASSWORD)
+        host = self.POSTGRES_HOST.strip()
+        database = self.POSTGRES_DB.strip()
+
+        return (
+            f"postgresql+asyncpg://{user}:{password}"
+            f"@{host}:{self.POSTGRES_PORT}/{database}"
+        )
 
     class Config:
         env_file = ".env"
