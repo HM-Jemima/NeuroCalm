@@ -1,16 +1,19 @@
 import { motion } from 'framer-motion';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Brain, Home, BarChart3, Users, FileText, Cpu, Server,
   Settings, LogOut, Search, UserPlus,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Avatar from '../../components/common/Avatar';
 import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
 import Button from '../../components/common/Button';
+import Modal from '../../components/common/Modal';
+import Input from '../../components/common/Input';
 import UsersTable from '../../components/admin/UsersTable';
 import useAuthStore from '../../store/authStore';
+import useToastStore from '../../store/toastStore';
 import { useAdmin } from '../../hooks/useAdmin';
 
 const adminNav = [
@@ -25,19 +28,106 @@ const adminNav = [
 
 export default function AdminUsers() {
   const { user, logout } = useAuthStore();
-  const { users, deleteUser } = useAdmin();
+  const { users, createUser, deleteUser, error } = useAdmin();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState('');
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [newUser, setNewUser] = useState({
+    full_name: '',
+    email: '',
+    password: '',
+    role: 'user',
+    is_active: true,
+  });
+  const showToast = useToastStore((state) => state.showToast);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
+  const resetForm = () => {
+    setNewUser({
+      full_name: '',
+      email: '',
+      password: '',
+      role: 'user',
+      is_active: true,
+    });
+    setFormError('');
+  };
+
+  const openAddUserModal = () => {
+    resetForm();
+    setIsAddUserOpen(true);
+  };
+
+  const closeAddUserModal = () => {
+    setIsAddUserOpen(false);
+    setIsSubmitting(false);
+    setFormError('');
+    if (searchParams.get('create') === '1') {
+      setSearchParams({}, { replace: true });
+    }
+  };
+
+  const handleFieldChange = (field, value) => {
+    setNewUser((current) => ({
+      ...current,
+      [field]: value,
+    }));
+  };
+
+  const handleCreateUser = async (event) => {
+    event.preventDefault();
+
+    if (!newUser.full_name.trim() || !newUser.email.trim() || !newUser.password.trim()) {
+      setFormError('Full name, email, and password are required.');
+      return;
+    }
+
+    if (newUser.password.trim().length < 6) {
+      setFormError('Password must be at least 6 characters.');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setFormError('');
+      await createUser({
+        ...newUser,
+        full_name: newUser.full_name.trim(),
+        email: newUser.email.trim(),
+        password: newUser.password.trim(),
+      });
+      showToast({
+        title: 'User created',
+        message: `${newUser.full_name.trim()} has been added successfully.`,
+        variant: 'success',
+      });
+      closeAddUserModal();
+      resetForm();
+    } catch (err) {
+      setFormError(err?.response?.data?.detail || 'Failed to create user.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const filteredUsers = users.filter((u) => {
     const name = u.full_name || u.email || '';
     return name.toLowerCase().includes(search.toLowerCase());
   });
+  const shouldOpenCreateModal = searchParams.get('create') === '1';
+
+  useEffect(() => {
+    if (shouldOpenCreateModal) {
+      openAddUserModal();
+    }
+  }, [shouldOpenCreateModal]);
 
   return (
     <div className="min-h-screen bg-bg-primary">
@@ -109,7 +199,7 @@ export default function AdminUsers() {
                 Manage platform users and their permissions
               </p>
             </div>
-            <Button size="sm">
+            <Button size="sm" onClick={openAddUserModal}>
               <UserPlus size={16} className="mr-2 inline" />
               Add User
             </Button>
@@ -127,11 +217,90 @@ export default function AdminUsers() {
             </div>
           </div>
 
+          {error && (
+            <p className="text-sm text-accent-red">{error}</p>
+          )}
+
           <Card hover={false}>
             <UsersTable users={filteredUsers} onDelete={deleteUser} />
           </Card>
         </motion.div>
       </main>
+
+      <Modal isOpen={isAddUserOpen} onClose={closeAddUserModal} title="Add User">
+        <form onSubmit={handleCreateUser} className="space-y-4">
+          <Input
+            label="Full Name"
+            value={newUser.full_name}
+            onChange={(e) => handleFieldChange('full_name', e.target.value)}
+            placeholder="Enter full name"
+          />
+
+          <Input
+            label="Email"
+            type="email"
+            value={newUser.email}
+            onChange={(e) => handleFieldChange('email', e.target.value)}
+            placeholder="Enter email address"
+          />
+
+          <Input
+            label="Password"
+            type="password"
+            value={newUser.password}
+            onChange={(e) => handleFieldChange('password', e.target.value)}
+            placeholder="Set a password"
+          />
+
+          <div>
+            <label className="block text-xs uppercase tracking-wider text-text-muted mb-2 font-medium">
+              Role
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {['user', 'admin'].map((role) => {
+                const active = newUser.role === role;
+                return (
+                  <button
+                    key={role}
+                    type="button"
+                    onClick={() => handleFieldChange('role', role)}
+                    className={`rounded-xl border px-3 py-2 text-sm font-medium transition-all ${
+                      active
+                        ? 'border-accent-blue bg-accent-blue/10 text-accent-blue'
+                        : 'border-border-color bg-bg-glass text-text-secondary hover:border-accent-blue/30 hover:text-text-primary'
+                    }`}
+                  >
+                    {role === 'admin' ? 'Administrator' : 'User'}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <label className="flex items-center gap-3 rounded-xl border border-border-color bg-bg-glass px-4 py-3 text-sm text-text-secondary">
+            <input
+              type="checkbox"
+              checked={newUser.is_active}
+              onChange={(e) => handleFieldChange('is_active', e.target.checked)}
+              className="h-4 w-4 rounded accent-accent-blue"
+            />
+            Active account
+          </label>
+
+          {formError && (
+            <p className="text-sm text-accent-red">{formError}</p>
+          )}
+
+          <div className="flex justify-end gap-3 pt-2">
+            <Button type="button" variant="ghost" onClick={closeAddUserModal}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Creating...' : 'Create User'}
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

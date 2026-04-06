@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.models.user import User
+from app.utils.confidence import get_display_confidence
 from app.utils.dependencies import get_current_user
 from app.services.analysis_service import get_analysis_by_id
 
@@ -27,11 +28,17 @@ async def download_report_json(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Analysis not found")
 
     class_probs = analysis.class_probabilities or [0.25, 0.25, 0.25, 0.25]
+    display_confidence = get_display_confidence(
+        analysis.confidence,
+        stress_score=analysis.stress_score,
+        workload_class=analysis.workload_class,
+        features_count=analysis.features_count,
+    )
     report = {
         "id": analysis.id,
         "filename": analysis.filename,
         "stress_score": analysis.stress_score,
-        "confidence": analysis.confidence,
+        "confidence": display_confidence,
         "stress_probability": analysis.stress_probability,
         "features_count": analysis.features_count,
         "band_powers": analysis.band_powers,
@@ -173,7 +180,7 @@ def _build_pdf(analysis) -> bytes:
     pdf.set_text_color(60, 60, 60)
 
     results = [
-        ("Confidence:", f"{analysis.confidence}%"),
+        ("Confidence:", f"{display_confidence}%"),
         ("Stress Probability:", f"{analysis.stress_probability}%"),
         ("Features Extracted:", f"{analysis.features_count:,}"),
     ]
@@ -278,4 +285,10 @@ async def download_report_pdf(
         io.BytesIO(pdf_bytes),
         media_type="application/pdf",
         headers={"Content-Disposition": f"attachment; filename=neurocalm_report_{analysis_id}.pdf"},
+    )
+    display_confidence = get_display_confidence(
+        analysis.confidence,
+        stress_score=analysis.stress_score,
+        workload_class=analysis.workload_class,
+        features_count=analysis.features_count,
     )

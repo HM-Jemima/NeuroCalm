@@ -1,3 +1,7 @@
+import appConfig from '../../config/appConfig';
+import { authService } from '../../services/authService';
+import useToastStore from '../../store/toastStore';
+
 const socials = [
   {
     name: 'Google',
@@ -32,11 +36,28 @@ const socials = [
 ];
 
 export default function SocialButtons() {
+  const showToast = useToastStore((state) => state.showToast);
+
+  const handleSocialClick = (provider) => {
+    if (!appConfig.useMockDataEnabled) {
+      localStorage.setItem('neurocalm_pending_oauth_provider', provider.toLowerCase());
+      window.location.assign(authService.getSocialLoginUrl(provider.toLowerCase()));
+      return;
+    }
+
+    showToast({
+      title: `${provider} sign-in is not available yet`,
+      message: 'We are currently in beta. Please continue with your email and password for now.',
+    });
+  };
+
   return (
     <div className="flex gap-3">
       {socials.map((social) => (
         <button
           key={social.name}
+          type="button"
+          onClick={() => handleSocialClick(social.name)}
           className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl
             bg-bg-glass border border-border-color text-text-secondary text-sm font-medium
             hover:border-accent-blue/30 hover:bg-accent-blue/5 transition-all duration-200"

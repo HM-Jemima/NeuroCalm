@@ -38,6 +38,8 @@ async def get_current_user(
             detail="Account is deactivated",
         )
 
+    setattr(user, "auth_provider", payload.get("auth_provider") or "local")
+
     return user
 
 

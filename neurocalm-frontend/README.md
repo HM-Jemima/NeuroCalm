@@ -1,16 +1,61 @@
-# React + Vite
+# NeuroCalm Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Run locally
 
-Currently, two official plugins are available:
+1. Install dependencies:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```powershell
+npm install
+```
 
-## React Compiler
+2. Start the dev server:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```powershell
+npm run dev
+```
 
-## Expanding the ESLint configuration
+3. Open:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- `http://localhost:5173`
+
+## API base URL
+
+The frontend reads the backend URL from `.env`:
+
+```env
+VITE_API_URL=http://localhost:8000/api/v1
+```
+
+## Mock vs live data toggle
+
+Use this file to switch the whole frontend between local mock data and the real backend:
+
+- `src/config/appConfig.js`
+
+Set:
+
+```js
+useMockDataEnabled: true
+```
+
+for mock mode, or:
+
+```js
+useMockDataEnabled: false
+```
+
+for live backend mode.
+
+When live mode is on, the dashboard, history, reports, login, and upload flow all use the backend API.
+
+## Live backend notes
+
+- Backend should run at `http://localhost:8000`
+- The backend API base should be `/api/v1`
+- Login uses the seeded users from the backend
+- Report downloads use the backend `/reports/:id/json` and `/reports/:id/pdf` routes
+
+## Upload notes
+
+The UI allows `.mat`, `.edf`, `.csv`, `.nir`, and `.oxy` files so it can cover both mock/demo use and the workspace test files.
+For the currently deployed real SALIENT model path, the reliable production input is still the model-ready CSV format expected by the backend.

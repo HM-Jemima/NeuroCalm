@@ -2,14 +2,15 @@ import { motion } from 'framer-motion';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   Brain, Home, BarChart3, Users, FileText, Cpu, Server,
-  Settings, LogOut, Save, Bell, Shield, Globe, Database,
+  Settings, LogOut, Save, Shield, Globe, Database,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Avatar from '../../components/common/Avatar';
 import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
 import Button from '../../components/common/Button';
 import useAuthStore from '../../store/authStore';
+import { useAdmin } from '../../hooks/useAdmin';
 
 const adminNav = [
   { label: 'Dashboard', icon: Home, path: '/admin' },
@@ -43,40 +44,52 @@ function Toggle({ enabled, onToggle }) {
 
 export default function AdminSettings() {
   const { user, logout } = useAuthStore();
+  const { settings, fetchSettings, saveSettings, error } = useAdmin();
   const navigate = useNavigate();
   const [saved, setSaved] = useState(false);
-
-  const [settings, setSettings] = useState({
-    siteName: 'NeuroCalm',
-    siteUrl: 'https://neurocalm.io',
-    maxUploadSize: '50',
-    allowedFormats: '.mat, .edf, .csv',
-    enableRegistration: true,
-    requireEmailVerification: false,
-    enableMaintenanceMode: false,
-    emailNotifications: true,
-    slackAlerts: false,
-    autoBackup: true,
-    retentionDays: '90',
+  const [formState, setFormState] = useState({
+    maintenance_mode: false,
+    allow_registration: true,
+    max_upload_size_mb: 50,
+    rate_limit_per_minute: 60,
+    storage_backend: 'local',
+    auto_delete_days: 90,
   });
+
+  useEffect(() => {
+    fetchSettings().catch(() => {});
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (settings) {
+      setFormState(settings);
+    }
+  }, [settings]);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    await saveSettings({
+      maintenance_mode: formState.maintenance_mode,
+      allow_registration: formState.allow_registration,
+      max_upload_size_mb: Number(formState.max_upload_size_mb),
+      rate_limit_per_minute: Number(formState.rate_limit_per_minute),
+      storage_backend: formState.storage_backend,
+      auto_delete_days: Number(formState.auto_delete_days),
+    });
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
 
   const updateSetting = (key, value) => {
-    setSettings((prev) => ({ ...prev, [key]: value }));
+    setFormState((current) => ({ ...current, [key]: value }));
   };
 
   return (
     <div className="min-h-screen bg-bg-primary">
-      {/* Admin Sidebar */}
       <aside className="fixed left-0 top-0 bottom-0 w-[260px] bg-bg-card/80 backdrop-blur-[20px] border-r border-border-color flex flex-col z-30">
         <div className="px-6 py-5 flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-blue to-accent-purple flex items-center justify-center">
@@ -130,20 +143,17 @@ export default function AdminSettings() {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="ml-[260px] p-8">
         <motion.div variants={container} initial="initial" animate="animate" className="space-y-6">
           <motion.div variants={fadeUp} className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-display font-bold text-text-primary">Settings</h1>
               <p className="text-sm text-text-secondary mt-1">
-                Platform configuration and preferences
+                Backend system configuration and limits
               </p>
             </div>
             <Button size="sm" onClick={handleSave} variant={saved ? 'success' : 'primary'}>
-              {saved ? (
-                <>Saved!</>
-              ) : (
+              {saved ? 'Saved!' : (
                 <>
                   <Save size={16} className="mr-2 inline" />
                   Save Changes
@@ -152,7 +162,12 @@ export default function AdminSettings() {
             </Button>
           </motion.div>
 
-          {/* General */}
+          {error && (
+            <motion.p variants={fadeUp} className="text-sm text-accent-red">
+              {error}
+            </motion.p>
+          )}
+
           <motion.div variants={fadeUp}>
             <Card hover={false}>
               <div className="flex items-center gap-3 mb-6">
@@ -161,48 +176,28 @@ export default function AdminSettings() {
                 </div>
                 <h3 className="text-lg font-semibold font-display text-text-primary">General</h3>
               </div>
-              <div className="space-y-5">
-                <div className="grid grid-cols-2 gap-5">
-                  <div>
-                    <label className="block text-sm text-text-secondary mb-2">Site Name</label>
-                    <input
-                      value={settings.siteName}
-                      onChange={(e) => updateSetting('siteName', e.target.value)}
-                      className="w-full px-4 py-2.5 bg-bg-primary border border-border-color rounded-xl text-sm text-text-primary focus:outline-none focus:border-accent-blue"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-text-secondary mb-2">Site URL</label>
-                    <input
-                      value={settings.siteUrl}
-                      onChange={(e) => updateSetting('siteUrl', e.target.value)}
-                      className="w-full px-4 py-2.5 bg-bg-primary border border-border-color rounded-xl text-sm text-text-primary focus:outline-none focus:border-accent-blue"
-                    />
-                  </div>
+              <div className="grid grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-sm text-text-secondary mb-2">Storage Backend</label>
+                  <input
+                    value={formState.storage_backend}
+                    onChange={(e) => updateSetting('storage_backend', e.target.value)}
+                    className="w-full px-4 py-2.5 bg-bg-primary border border-border-color rounded-xl text-sm text-text-primary focus:outline-none focus:border-accent-blue"
+                  />
                 </div>
-                <div className="grid grid-cols-2 gap-5">
-                  <div>
-                    <label className="block text-sm text-text-secondary mb-2">Max Upload Size (MB)</label>
-                    <input
-                      value={settings.maxUploadSize}
-                      onChange={(e) => updateSetting('maxUploadSize', e.target.value)}
-                      className="w-full px-4 py-2.5 bg-bg-primary border border-border-color rounded-xl text-sm text-text-primary focus:outline-none focus:border-accent-blue"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-text-secondary mb-2">Allowed File Formats</label>
-                    <input
-                      value={settings.allowedFormats}
-                      onChange={(e) => updateSetting('allowedFormats', e.target.value)}
-                      className="w-full px-4 py-2.5 bg-bg-primary border border-border-color rounded-xl text-sm text-text-primary focus:outline-none focus:border-accent-blue"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm text-text-secondary mb-2">Max Upload Size (MB)</label>
+                  <input
+                    type="number"
+                    value={formState.max_upload_size_mb}
+                    onChange={(e) => updateSetting('max_upload_size_mb', e.target.value)}
+                    className="w-full px-4 py-2.5 bg-bg-primary border border-border-color rounded-xl text-sm text-text-primary focus:outline-none focus:border-accent-blue"
+                  />
                 </div>
               </div>
             </Card>
           </motion.div>
 
-          {/* Security */}
           <motion.div variants={fadeUp}>
             <Card hover={false}>
               <div className="flex items-center gap-3 mb-6">
@@ -213,9 +208,8 @@ export default function AdminSettings() {
               </div>
               <div className="space-y-4">
                 {[
-                  { key: 'enableRegistration', label: 'Enable User Registration', desc: 'Allow new users to create accounts' },
-                  { key: 'requireEmailVerification', label: 'Require Email Verification', desc: 'Users must verify email before accessing the platform' },
-                  { key: 'enableMaintenanceMode', label: 'Maintenance Mode', desc: 'Disable access for non-admin users' },
+                  { key: 'allow_registration', label: 'Allow Registration', desc: 'Permit new users to create accounts' },
+                  { key: 'maintenance_mode', label: 'Maintenance Mode', desc: 'Restrict the app for admin-only maintenance work' },
                 ].map((item) => (
                   <div key={item.key} className="flex items-center justify-between py-3 border-b border-border-color/50 last:border-0">
                     <div>
@@ -223,8 +217,8 @@ export default function AdminSettings() {
                       <p className="text-xs text-text-muted mt-0.5">{item.desc}</p>
                     </div>
                     <Toggle
-                      enabled={settings[item.key]}
-                      onToggle={() => updateSetting(item.key, !settings[item.key])}
+                      enabled={!!formState[item.key]}
+                      onToggle={() => updateSetting(item.key, !formState[item.key])}
                     />
                   </div>
                 ))}
@@ -232,63 +226,32 @@ export default function AdminSettings() {
             </Card>
           </motion.div>
 
-          {/* Notifications */}
-          <motion.div variants={fadeUp}>
-            <Card hover={false}>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-accent-cyan/10 flex items-center justify-center">
-                  <Bell size={18} className="text-accent-cyan" />
-                </div>
-                <h3 className="text-lg font-semibold font-display text-text-primary">Notifications</h3>
-              </div>
-              <div className="space-y-4">
-                {[
-                  { key: 'emailNotifications', label: 'Email Notifications', desc: 'Receive admin alerts via email' },
-                  { key: 'slackAlerts', label: 'Slack Alerts', desc: 'Send critical alerts to Slack channel' },
-                ].map((item) => (
-                  <div key={item.key} className="flex items-center justify-between py-3 border-b border-border-color/50 last:border-0">
-                    <div>
-                      <p className="text-sm font-medium text-text-primary">{item.label}</p>
-                      <p className="text-xs text-text-muted mt-0.5">{item.desc}</p>
-                    </div>
-                    <Toggle
-                      enabled={settings[item.key]}
-                      onToggle={() => updateSetting(item.key, !settings[item.key])}
-                    />
-                  </div>
-                ))}
-              </div>
-            </Card>
-          </motion.div>
-
-          {/* Data */}
           <motion.div variants={fadeUp}>
             <Card hover={false}>
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-xl bg-accent-green/10 flex items-center justify-center">
                   <Database size={18} className="text-accent-green" />
                 </div>
-                <h3 className="text-lg font-semibold font-display text-text-primary">Data & Storage</h3>
+                <h3 className="text-lg font-semibold font-display text-text-primary">Rate Limits & Retention</h3>
               </div>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between py-3 border-b border-border-color/50">
-                  <div>
-                    <p className="text-sm font-medium text-text-primary">Automatic Backups</p>
-                    <p className="text-xs text-text-muted mt-0.5">Run daily database backups</p>
-                  </div>
-                  <Toggle
-                    enabled={settings.autoBackup}
-                    onToggle={() => updateSetting('autoBackup', !settings.autoBackup)}
+              <div className="grid grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-sm text-text-secondary mb-2">Rate Limit Per Minute</label>
+                  <input
+                    type="number"
+                    value={formState.rate_limit_per_minute}
+                    onChange={(e) => updateSetting('rate_limit_per_minute', e.target.value)}
+                    className="w-full px-4 py-2.5 bg-bg-primary border border-border-color rounded-xl text-sm text-text-primary focus:outline-none focus:border-accent-blue"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-text-secondary mb-2">Data Retention (days)</label>
+                  <label className="block text-sm text-text-secondary mb-2">Auto Delete After (days)</label>
                   <input
-                    value={settings.retentionDays}
-                    onChange={(e) => updateSetting('retentionDays', e.target.value)}
-                    className="w-full max-w-xs px-4 py-2.5 bg-bg-primary border border-border-color rounded-xl text-sm text-text-primary focus:outline-none focus:border-accent-blue"
+                    type="number"
+                    value={formState.auto_delete_days}
+                    onChange={(e) => updateSetting('auto_delete_days', e.target.value)}
+                    className="w-full px-4 py-2.5 bg-bg-primary border border-border-color rounded-xl text-sm text-text-primary focus:outline-none focus:border-accent-blue"
                   />
-                  <p className="text-xs text-text-muted mt-1">Analysis data older than this will be archived</p>
                 </div>
               </div>
             </Card>

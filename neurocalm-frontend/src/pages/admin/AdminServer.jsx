@@ -2,13 +2,14 @@ import { motion } from 'framer-motion';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   Brain, Home, BarChart3, Users, FileText, Cpu, Server,
-  Settings, LogOut, HardDrive, Wifi, Database, Shield,
-  CheckCircle, AlertTriangle,
+  Settings, LogOut, CheckCircle,
 } from 'lucide-react';
+import { useEffect } from 'react';
 import Avatar from '../../components/common/Avatar';
 import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
 import useAuthStore from '../../store/authStore';
+import { useAdmin } from '../../hooks/useAdmin';
 
 const adminNav = [
   { label: 'Dashboard', icon: Home, path: '/admin' },
@@ -18,31 +19,6 @@ const adminNav = [
   { label: 'ML Model', icon: Cpu, path: '/admin/model' },
   { label: 'Server', icon: Server, path: '/admin/server' },
   { label: 'Settings', icon: Settings, path: '/admin/settings' },
-];
-
-const serverStats = [
-  { label: 'CPU Usage', value: '34%', icon: Cpu, color: 'bg-accent-blue/10 text-accent-blue', bar: 34 },
-  { label: 'Memory', value: '6.2 / 16 GB', icon: HardDrive, color: 'bg-accent-purple/10 text-accent-purple', bar: 39 },
-  { label: 'Disk Usage', value: '48.3 / 100 GB', icon: Database, color: 'bg-accent-cyan/10 text-accent-cyan', bar: 48 },
-  { label: 'Network', value: '124 Mbps', icon: Wifi, color: 'bg-accent-green/10 text-accent-green', bar: 62 },
-];
-
-const services = [
-  { name: 'API Server', status: 'running', uptime: '14d 6h 32m', port: 8000 },
-  { name: 'ML Inference Engine', status: 'running', uptime: '14d 6h 32m', port: 8001 },
-  { name: 'PostgreSQL Database', status: 'running', uptime: '30d 2h 15m', port: 5432 },
-  { name: 'Redis Cache', status: 'running', uptime: '30d 2h 15m', port: 6379 },
-  { name: 'Task Queue (Celery)', status: 'running', uptime: '14d 6h 30m', port: '-' },
-  { name: 'File Storage (S3)', status: 'running', uptime: '99.99%', port: '-' },
-];
-
-const recentLogs = [
-  { time: '14:32:05', level: 'INFO', message: 'Analysis A-1042 completed successfully (12.1s)' },
-  { time: '14:31:52', level: 'INFO', message: 'File upload received: eeg_session_12.mat (2.4 MB)' },
-  { time: '14:28:11', level: 'WARN', message: 'ML inference latency above threshold (15.2s > 15s)' },
-  { time: '14:25:03', level: 'INFO', message: 'User login: admin@neurocalm.com' },
-  { time: '14:20:45', level: 'INFO', message: 'Analysis A-1041 completed successfully (11.8s)' },
-  { time: '14:15:22', level: 'INFO', message: 'Cache cleared: 142 expired entries removed' },
 ];
 
 const levelColors = {
@@ -56,7 +32,12 @@ const fadeUp = { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 } }
 
 export default function AdminServer() {
   const { user, logout } = useAuthStore();
+  const { serverStatus, fetchServerStatus, error } = useAdmin();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchServerStatus().catch(() => {});
+  }, [user?.id]);
 
   const handleLogout = () => {
     logout();
@@ -65,7 +46,6 @@ export default function AdminServer() {
 
   return (
     <div className="min-h-screen bg-bg-primary">
-      {/* Admin Sidebar */}
       <aside className="fixed left-0 top-0 bottom-0 w-[260px] bg-bg-card/80 backdrop-blur-[20px] border-r border-border-color flex flex-col z-30">
         <div className="px-6 py-5 flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-blue to-accent-purple flex items-center justify-center">
@@ -119,7 +99,6 @@ export default function AdminServer() {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="ml-[260px] p-8">
         <motion.div variants={container} initial="initial" animate="animate" className="space-y-6">
           <motion.div variants={fadeUp}>
@@ -129,32 +108,36 @@ export default function AdminServer() {
             </p>
           </motion.div>
 
-          {/* Resource Usage */}
+          {error && (
+            <motion.p variants={fadeUp} className="text-sm text-accent-red">
+              {error}
+            </motion.p>
+          )}
+
           <motion.div variants={fadeUp} className="grid grid-cols-2 gap-4">
-            {serverStats.map((s) => (
-              <Card key={s.label} hover={false}>
+            {(serverStatus?.resources || []).map((resource) => (
+              <Card key={resource.label} hover={false}>
                 <div className="flex items-center gap-3 mb-3">
-                  <div className={`w-10 h-10 rounded-xl ${s.color} flex items-center justify-center`}>
-                    <s.icon size={18} />
+                  <div className="w-10 h-10 rounded-xl bg-accent-blue/10 text-accent-blue flex items-center justify-center">
+                    <Server size={18} />
                   </div>
                   <div>
-                    <p className="text-xs text-text-muted">{s.label}</p>
-                    <p className="text-sm font-semibold text-text-primary">{s.value}</p>
+                    <p className="text-xs text-text-muted">{resource.label}</p>
+                    <p className="text-sm font-semibold text-text-primary">{resource.value}</p>
                   </div>
                 </div>
                 <div className="h-2 bg-bg-glass rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full ${
-                      s.bar > 80 ? 'bg-accent-red' : s.bar > 60 ? 'bg-accent-yellow' : 'bg-accent-blue'
+                      resource.bar > 80 ? 'bg-accent-red' : resource.bar > 60 ? 'bg-accent-yellow' : 'bg-accent-blue'
                     }`}
-                    style={{ width: `${s.bar}%` }}
+                    style={{ width: `${resource.bar}%` }}
                   />
                 </div>
               </Card>
             ))}
           </motion.div>
 
-          {/* Services */}
           <motion.div variants={fadeUp}>
             <Card hover={false}>
               <h3 className="text-lg font-semibold font-display text-text-primary mb-4">
@@ -170,17 +153,17 @@ export default function AdminServer() {
                   </tr>
                 </thead>
                 <tbody>
-                  {services.map((svc) => (
-                    <tr key={svc.name} className="border-b border-border-color/50 hover:bg-bg-glass/50 transition-colors">
-                      <td className="py-3 px-4 text-sm text-text-primary">{svc.name}</td>
+                  {(serverStatus?.services || []).map((service) => (
+                    <tr key={service.name} className="border-b border-border-color/50 hover:bg-bg-glass/50 transition-colors">
+                      <td className="py-3 px-4 text-sm text-text-primary">{service.name}</td>
                       <td className="py-3 px-4">
-                        <span className="flex items-center gap-1.5 text-xs font-medium text-accent-green">
+                        <span className={`flex items-center gap-1.5 text-xs font-medium ${service.status === 'running' ? 'text-accent-green' : 'text-accent-red'}`}>
                           <CheckCircle size={12} />
-                          {svc.status}
+                          {service.status}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-sm text-text-secondary">{svc.uptime}</td>
-                      <td className="py-3 px-4 text-sm text-text-muted font-mono">{svc.port}</td>
+                      <td className="py-3 px-4 text-sm text-text-secondary">{service.uptime}</td>
+                      <td className="py-3 px-4 text-sm text-text-muted font-mono">{service.port}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -188,17 +171,16 @@ export default function AdminServer() {
             </Card>
           </motion.div>
 
-          {/* Recent Logs */}
           <motion.div variants={fadeUp}>
             <Card hover={false}>
               <h3 className="text-lg font-semibold font-display text-text-primary mb-4">
                 Recent Logs
               </h3>
               <div className="space-y-2 font-mono text-xs">
-                {recentLogs.map((log, i) => (
-                  <div key={i} className="flex gap-4 px-3 py-2 rounded-lg bg-bg-primary/50">
+                {(serverStatus?.logs || []).map((log, index) => (
+                  <div key={`${log.time}-${index}`} className="flex gap-4 px-3 py-2 rounded-lg bg-bg-primary/50">
                     <span className="text-text-muted flex-shrink-0">{log.time}</span>
-                    <span className={`flex-shrink-0 w-12 ${levelColors[log.level]}`}>{log.level}</span>
+                    <span className={`flex-shrink-0 w-12 ${levelColors[log.level] || 'text-text-muted'}`}>{log.level}</span>
                     <span className="text-text-secondary">{log.message}</span>
                   </div>
                 ))}

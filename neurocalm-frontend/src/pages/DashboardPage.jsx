@@ -12,44 +12,68 @@ import HistoryTable from '../components/dashboard/HistoryTable';
 import useAuthStore from '../store/authStore';
 import { useAnalysis } from '../hooks/useAnalysis';
 import { formatDate } from '../utils/helpers';
+import { getAnalysisBandPowers } from '../utils/analysisPresentation';
 
-function getBandPowers(item) {
-  if (item.band_powers) return item.band_powers;
-  const s = item.stress_score ?? 50;
-  return {
-    delta: Math.min(45, Math.max(15, 35 - Math.round(s * 0.1))),
-    theta: Math.min(35, Math.max(10, 22 + Math.round((s - 50) * 0.08))),
-    alpha: Math.min(30, Math.max(8, 25 - Math.round(s * 0.15))),
-    beta: Math.min(25, Math.max(5, 8 + Math.round(s * 0.12))),
-    gamma: Math.min(15, Math.max(3, 5 + Math.round(s * 0.05))),
-  };
+function average(values) {
+  if (!values.length) {
+    return 0;
+  }
+  return Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
 }
 
-function downloadJSON(item) {
-  const data = {
-    id: item.id,
-    filename: item.filename || item.file_name,
-    stress_score: item.stress_score ?? item.score,
-    confidence: item.confidence,
-    band_powers: getBandPowers(item),
-    analyzed_by: item.user_name,
-    created_at: item.created_at || item.date,
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `neurocalm_analysis_${item.id}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
+function formatRelativeTime(dateStr) {
+  if (!dateStr) {
+    return 'No data';
+  }
+
+  const diffMs = Math.max(0, Date.now() - new Date(dateStr).getTime());
+  const minutes = Math.floor(diffMs / 60000);
+  const hours = Math.floor(diffMs / 3600000);
+  const days = Math.floor(diffMs / 86400000);
+
+  if (minutes < 60) {
+    return `${Math.max(minutes, 1)}m ago`;
+  }
+  if (hours < 24) {
+    return `${hours}h ago`;
+  }
+  return `${Math.max(days, 1)}d ago`;
 }
 
-const quickStats = [
-  { icon: FileText, label: 'Total Analyses', value: '24', change: '+12%', iconBg: 'bg-accent-blue/10', iconColor: 'text-accent-blue' },
-  { icon: Activity, label: 'Avg Stress Score', value: '32', change: '-5%', iconBg: 'bg-accent-green/10', iconColor: 'text-accent-green' },
-  { icon: Clock, label: 'Last Analysis', value: '2h ago', iconBg: 'bg-accent-purple/10', iconColor: 'text-accent-purple' },
-  { icon: TrendingUp, label: 'Trend', value: 'Improving', change: '+8%', iconBg: 'bg-accent-cyan/10', iconColor: 'text-accent-cyan' },
-];
+function buildQuickStats(items) {
+  const totalAnalyses = items.length;
+  const avgStress = average(items.map((item) => item.stress_score ?? item.score ?? 0));
+  const recentAvg = average(items.slice(0, 3).map((item) => item.stress_score ?? item.score ?? 0));
+  const previousAvg = average(items.slice(3, 6).map((item) => item.stress_score ?? item.score ?? 0));
+  const improvement = previousAvg > 0 ? previousAvg - recentAvg : null;
+  const lastAnalysis = items[0]?.created_at;
+  const trendLabel = avgStress <= 40 ? 'Calmer' : avgStress <= 60 ? 'Stable' : 'Elevated';
+
+  return [
+    { icon: FileText, label: 'Total Analyses', value: String(totalAnalyses), iconBg: 'bg-accent-blue/10', iconColor: 'text-accent-blue' },
+    { icon: Activity, label: 'Avg Stress Score', value: String(avgStress), change: improvement === null ? null : `${improvement}`, iconBg: 'bg-accent-green/10', iconColor: 'text-accent-green' },
+    { icon: Clock, label: 'Last Analysis', value: formatRelativeTime(lastAnalysis), iconBg: 'bg-accent-purple/10', iconColor: 'text-accent-purple' },
+    { icon: TrendingUp, label: 'Trend', value: trendLabel, change: improvement === null ? null : `${improvement}`, iconBg: 'bg-accent-cyan/10', iconColor: 'text-accent-cyan' },
+  ];
+}
+
+function buildBreakdownStats(items) {
+  const total = items.length;
+  const relaxed = items.filter((item) => (item.stress_score ?? item.score ?? 0) <= 40).length;
+  const moderate = items.filter((item) => {
+    const score = item.stress_score ?? item.score ?? 0;
+    return score > 40 && score <= 60;
+  }).length;
+  const stressed = items.filter((item) => (item.stress_score ?? item.score ?? 0) > 60).length;
+  const avgConfidence = average(items.map((item) => item.confidence ?? 0));
+
+  return [
+    { label: 'Relaxed Results', displayValue: String(relaxed), width: total ? (relaxed / total) * 100 : 0, color: 'bg-accent-green' },
+    { label: 'Stressed Results', displayValue: String(stressed), width: total ? (stressed / total) * 100 : 0, color: 'bg-accent-red' },
+    { label: 'Moderate Results', displayValue: String(moderate), width: total ? (moderate / total) * 100 : 0, color: 'bg-accent-yellow' },
+    { label: 'Avg Confidence', displayValue: `${avgConfidence}%`, width: avgConfidence, color: 'bg-accent-blue' },
+  ];
+}
 
 const container = {
   animate: { transition: { staggerChildren: 0.08 } },
@@ -69,13 +93,29 @@ export default function DashboardPage() {
     history,
     uploadAndAnalyze,
     fetchHistory,
+    getAnalysisDetails,
     deleteAnalysis,
+    downloadReportJson,
+    error,
   } = useAnalysis();
   const [viewItem, setViewItem] = useState(null);
+  const quickStats = buildQuickStats(history);
+  const breakdownStats = buildBreakdownStats(history);
 
   useEffect(() => {
     fetchHistory().catch(() => {});
-  }, []);
+  }, [user?.email]);
+
+  const handleView = async (item) => {
+    setViewItem(item);
+
+    try {
+      const details = await getAnalysisDetails(item.id);
+      setViewItem(details);
+    } catch {
+      // Keep the lightweight row data visible if the detail request fails.
+    }
+  };
 
   return (
     <div className="min-h-screen bg-bg-primary">
@@ -88,14 +128,13 @@ export default function DashboardPage() {
           animate="animate"
           className="space-y-8"
         >
-          {/* Header */}
           <motion.div variants={fadeUp} className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-display font-bold text-text-primary">
                 Welcome back, {user?.full_name?.split(' ')[0] || 'User'}
               </h1>
               <p className="text-sm text-text-secondary mt-1">
-                Here's an overview of your brain analysis activity
+                Here&apos;s an overview of your brain analysis activity
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -113,24 +152,26 @@ export default function DashboardPage() {
             </div>
           </motion.div>
 
-          {/* Stats */}
           <motion.div variants={fadeUp} className="grid grid-cols-4 gap-4">
             {quickStats.map((stat) => (
               <StatsCard key={stat.label} {...stat} />
             ))}
           </motion.div>
 
-          {/* Upload + Quick Stats */}
           <motion.div variants={fadeUp} className="grid grid-cols-[1fr_400px] gap-6">
             <Card hover={false}>
               <h3 className="text-lg font-semibold font-display text-text-primary mb-4">
-                Upload EEG File
+                Upload Analysis File
               </h3>
               <UploadZone
                 onAnalyze={uploadAndAnalyze}
                 isAnalyzing={isAnalyzing}
                 uploadProgress={uploadProgress}
+                resultId={currentAnalysis?.id}
               />
+              {error && (
+                <p className="mt-4 text-sm text-accent-red">{error}</p>
+              )}
             </Card>
 
             <Card hover={false}>
@@ -138,21 +179,16 @@ export default function DashboardPage() {
                 Quick Stats
               </h3>
               <div className="space-y-4">
-                {[
-                  { label: 'Relaxed Results', value: '18', total: '24', color: 'bg-accent-green' },
-                  { label: 'Stressed Results', value: '4', total: '24', color: 'bg-accent-red' },
-                  { label: 'Moderate Results', value: '2', total: '24', color: 'bg-accent-yellow' },
-                  { label: 'Avg Confidence', value: '89%', total: '100', color: 'bg-accent-blue' },
-                ].map((stat) => (
+                {breakdownStats.map((stat) => (
                   <div key={stat.label}>
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-sm text-text-secondary">{stat.label}</span>
-                      <span className="text-sm font-semibold text-text-primary">{stat.value}</span>
+                      <span className="text-sm font-semibold text-text-primary">{stat.displayValue}</span>
                     </div>
                     <div className="h-2 bg-bg-glass rounded-full overflow-hidden">
                       <div
                         className={`h-full ${stat.color} rounded-full transition-all`}
-                        style={{ width: `${(parseInt(stat.value) / parseInt(stat.total)) * 100}%` }}
+                        style={{ width: `${stat.width}%` }}
                       />
                     </div>
                   </div>
@@ -161,7 +197,6 @@ export default function DashboardPage() {
             </Card>
           </motion.div>
 
-          {/* Results Section */}
           {currentAnalysis && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -184,7 +219,6 @@ export default function DashboardPage() {
             </motion.div>
           )}
 
-          {/* History */}
           <motion.div variants={fadeUp}>
             <Card hover={false}>
               <h3 className="text-lg font-semibold font-display text-text-primary mb-4">
@@ -192,8 +226,8 @@ export default function DashboardPage() {
               </h3>
               <HistoryTable
                 items={history}
-                onView={(item) => setViewItem(item)}
-                onDownload={(item) => downloadJSON(item)}
+                onView={handleView}
+                onDownload={(item) => downloadReportJson(item.id, item)}
                 onDelete={deleteAnalysis}
               />
             </Card>
@@ -201,7 +235,6 @@ export default function DashboardPage() {
         </motion.div>
       </main>
 
-      {/* View Modal */}
       <Modal
         isOpen={!!viewItem}
         onClose={() => setViewItem(null)}
@@ -225,7 +258,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               <button
-                onClick={() => downloadJSON(viewItem)}
+                onClick={() => downloadReportJson(viewItem.id, viewItem)}
                 className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border-color text-sm text-text-secondary hover:border-accent-blue hover:text-accent-blue transition-all"
               >
                 <Download size={14} />
@@ -244,7 +277,7 @@ export default function DashboardPage() {
                 <h4 className="text-sm font-medium text-text-muted mb-4 uppercase tracking-wider">
                   Band Power Breakdown
                 </h4>
-                <BandPowerChart bandPowers={getBandPowers(viewItem)} />
+                <BandPowerChart bandPowers={getAnalysisBandPowers(viewItem)} />
               </div>
             </div>
           </div>

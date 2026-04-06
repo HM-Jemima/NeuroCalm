@@ -1,8 +1,42 @@
-import { MoreHorizontal, Shield, User } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { MoreHorizontal, Shield, Trash2, User } from 'lucide-react';
 import Avatar from '../common/Avatar';
 import Badge from '../common/Badge';
 
 export default function UsersTable({ users = [], onDelete }) {
+  const [openMenuUserId, setOpenMenuUserId] = useState(null);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    if (!openMenuUserId) {
+      return undefined;
+    }
+
+    const handleOutsideClick = (event) => {
+      if (!menuRef.current?.contains(event.target)) {
+        setOpenMenuUserId(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, [openMenuUserId]);
+
+  const handleDeleteClick = (user) => {
+    if (user.is_active === false) {
+      setOpenMenuUserId(null);
+      return;
+    }
+
+    const confirmed = window.confirm(`Deactivate ${user.full_name || user.email}?`);
+    if (!confirmed) {
+      return;
+    }
+
+    setOpenMenuUserId(null);
+    onDelete?.(user.id);
+  };
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
@@ -56,12 +90,30 @@ export default function UsersTable({ users = [], onDelete }) {
                 {user.created_at ? new Date(user.created_at).toLocaleDateString() : '--'}
               </td>
               <td className="py-3 px-4">
-                <button
-                  onClick={() => onDelete?.(user.id)}
-                  className="w-8 h-8 rounded-lg border border-border-color flex items-center justify-center text-text-muted hover:border-accent-blue hover:text-accent-blue transition-all"
-                >
-                  <MoreHorizontal size={14} />
-                </button>
+                <div ref={openMenuUserId === user.id ? menuRef : null} className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setOpenMenuUserId((current) => (current === user.id ? null : user.id))}
+                    className="w-8 h-8 rounded-lg border border-border-color flex items-center justify-center text-text-muted hover:border-accent-blue hover:text-accent-blue transition-all"
+                    aria-label={`Open actions for ${user.full_name || user.email}`}
+                  >
+                    <MoreHorizontal size={14} />
+                  </button>
+
+                  {openMenuUserId === user.id && (
+                    <div className="absolute right-0 z-20 mt-2 min-w-[160px] overflow-hidden rounded-xl border border-border-color bg-bg-secondary/95 shadow-[0_18px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl">
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteClick(user)}
+                        disabled={user.is_active === false}
+                        className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-accent-red transition-colors hover:bg-accent-red/10 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent"
+                      >
+                        <Trash2 size={14} />
+                        {user.is_active === false ? 'User inactive' : 'Deactivate user'}
+                      </button>
+                    </div>
+                  )}
+                </div>
               </td>
             </tr>
           ))}

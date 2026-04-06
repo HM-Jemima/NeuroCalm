@@ -4,6 +4,7 @@ import {
   Brain, Home, BarChart3, Users, FileText, Cpu, Server,
   Settings, LogOut, UserPlus, Download, RefreshCw, Shield,
 } from 'lucide-react';
+import { useEffect } from 'react';
 import Avatar from '../../components/common/Avatar';
 import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
@@ -41,7 +42,7 @@ const fadeUp = { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 } }
 
 export default function AdminDashboard() {
   const { user, logout } = useAuthStore();
-  const { stats, users, modelInfo, deleteUser } = useAdmin();
+  const { stats, users, modelInfo, serverStatus, deleteUser, fetchServerStatus, error } = useAdmin();
   const {
     currentAnalysis,
     isAnalyzing,
@@ -55,6 +56,14 @@ export default function AdminDashboard() {
     logout();
     navigate('/login');
   };
+
+  const openAddUserFlow = () => {
+    navigate('/admin/users?create=1');
+  };
+
+  useEffect(() => {
+    fetchServerStatus().catch(() => {});
+  }, [user?.id]);
 
   return (
     <div className="min-h-screen bg-bg-primary">
@@ -123,6 +132,12 @@ export default function AdminDashboard() {
             </p>
           </motion.div>
 
+          {error && (
+            <motion.p variants={fadeUp} className="text-sm text-accent-red">
+              {error}
+            </motion.p>
+          )}
+
           {/* Stats Grid */}
           <motion.div variants={fadeUp} className="grid grid-cols-4 gap-4">
             <StatsCard
@@ -182,6 +197,7 @@ export default function AdminDashboard() {
                   onAnalyze={uploadAndAnalyze}
                   isAnalyzing={isAnalyzing}
                   uploadProgress={uploadProgress}
+                  resultId={currentAnalysis?.id}
                 />
               </Card>
 
@@ -210,7 +226,11 @@ export default function AdminDashboard() {
               <Card hover={false}>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold font-display text-text-primary">Users</h3>
-                  <button className="text-sm text-accent-blue hover:underline flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={openAddUserFlow}
+                    className="text-sm text-accent-blue hover:underline flex items-center gap-1"
+                  >
                     <UserPlus size={14} />
                     Add User
                   </button>
@@ -225,14 +245,14 @@ export default function AdminDashboard() {
                 <h3 className="text-lg font-semibold font-display text-text-primary mb-4">
                   Activity Feed
                 </h3>
-                <ActivityFeed />
+                <ActivityFeed activities={serverStatus?.logs} />
               </Card>
 
               <Card hover={false}>
                 <h3 className="text-lg font-semibold font-display text-text-primary mb-4">
                   System Status
                 </h3>
-                <SystemStats />
+                <SystemStats stats={serverStatus?.resources} />
               </Card>
 
               <Card hover={false}>
@@ -250,6 +270,8 @@ export default function AdminDashboard() {
                   {quickActions.map((action) => (
                     <button
                       key={action.label}
+                      type="button"
+                      onClick={action.label === 'Add User' ? openAddUserFlow : undefined}
                       className={`flex flex-col items-center gap-2 p-4 rounded-xl border border-border-color hover:border-accent-blue/30 transition-all`}
                     >
                       <div className={`w-10 h-10 rounded-xl ${action.color} flex items-center justify-center`}>

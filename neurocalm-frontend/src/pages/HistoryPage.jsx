@@ -8,49 +8,36 @@ import HistoryTable from '../components/dashboard/HistoryTable';
 import AnalysisResult from '../components/dashboard/AnalysisResult';
 import BandPowerChart from '../components/dashboard/BandPowerChart';
 import { useAnalysis } from '../hooks/useAnalysis';
+import useAuthStore from '../store/authStore';
 import { formatDate } from '../utils/helpers';
-
-// Generate mock band powers for items that don't have them
-function getBandPowers(item) {
-  if (item.band_powers) return item.band_powers;
-  // Derive deterministic but varied band powers from the stress score
-  const s = item.stress_score ?? 50;
-  return {
-    delta: Math.min(45, Math.max(15, 35 - Math.round(s * 0.1))),
-    theta: Math.min(35, Math.max(10, 22 + Math.round((s - 50) * 0.08))),
-    alpha: Math.min(30, Math.max(8, 25 - Math.round(s * 0.15))),
-    beta: Math.min(25, Math.max(5, 8 + Math.round(s * 0.12))),
-    gamma: Math.min(15, Math.max(3, 5 + Math.round(s * 0.05))),
-  };
-}
-
-function downloadJSON(item) {
-  const data = {
-    id: item.id,
-    filename: item.filename || item.file_name,
-    stress_score: item.stress_score ?? item.score,
-    confidence: item.confidence,
-    band_powers: getBandPowers(item),
-    analyzed_by: item.user_name,
-    created_at: item.created_at || item.date,
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `neurocalm_analysis_${item.id}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
+import { getAnalysisBandPowers } from '../utils/analysisPresentation';
 
 export default function HistoryPage() {
-  const { history, fetchHistory, deleteAnalysis } = useAnalysis();
+  const { user } = useAuthStore();
+  const {
+    history,
+    fetchHistory,
+    getAnalysisDetails,
+    deleteAnalysis,
+    downloadReportJson,
+  } = useAnalysis();
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState(null);
 
   useEffect(() => {
     fetchHistory().catch(() => {});
-  }, []);
+  }, [user?.email]);
+
+  const handleView = async (item) => {
+    setSelected(item);
+
+    try {
+      const details = await getAnalysisDetails(item.id);
+      setSelected(details);
+    } catch {
+      // Keep the lightweight row data visible if the detail request fails.
+    }
+  };
 
   const filteredHistory = history.filter((item) => {
     const name = item.filename || item.file_name || '';
@@ -67,17 +54,15 @@ export default function HistoryPage() {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-6"
         >
-          {/* Header */}
           <div>
             <h1 className="text-2xl font-display font-bold text-text-primary">
               Analysis History
             </h1>
             <p className="text-sm text-text-secondary mt-1">
-              View and manage your past EEG analyses
+              View and manage your past stress analyses
             </p>
           </div>
 
-          {/* Filters */}
           <div className="flex items-center gap-4">
             <div className="relative flex-1 max-w-sm">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
@@ -94,19 +79,17 @@ export default function HistoryPage() {
             </button>
           </div>
 
-          {/* Table */}
           <Card hover={false}>
             <HistoryTable
               items={filteredHistory}
-              onView={(item) => setSelected(item)}
-              onDownload={(item) => downloadJSON(item)}
+              onView={handleView}
+              onDownload={(item) => downloadReportJson(item.id, item)}
               onDelete={deleteAnalysis}
             />
           </Card>
         </motion.div>
       </main>
 
-      {/* View Modal */}
       <Modal
         isOpen={!!selected}
         onClose={() => setSelected(null)}
@@ -115,7 +98,6 @@ export default function HistoryPage() {
       >
         {selected && (
           <div className="space-y-6">
-            {/* File info header */}
             <div className="flex items-center justify-between px-1">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-accent-blue/10 rounded-xl flex items-center justify-center">
@@ -131,7 +113,7 @@ export default function HistoryPage() {
                 </div>
               </div>
               <button
-                onClick={() => downloadJSON(selected)}
+                onClick={() => downloadReportJson(selected.id, selected)}
                 className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border-color text-sm text-text-secondary hover:border-accent-blue hover:text-accent-blue transition-all"
               >
                 <Download size={14} />
@@ -139,7 +121,6 @@ export default function HistoryPage() {
               </button>
             </div>
 
-            {/* Result + Band Power side by side */}
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <h4 className="text-sm font-medium text-text-muted mb-4 uppercase tracking-wider">
@@ -151,7 +132,7 @@ export default function HistoryPage() {
                 <h4 className="text-sm font-medium text-text-muted mb-4 uppercase tracking-wider">
                   Band Power Breakdown
                 </h4>
-                <BandPowerChart bandPowers={getBandPowers(selected)} />
+                <BandPowerChart bandPowers={getAnalysisBandPowers(selected)} />
               </div>
             </div>
           </div>
