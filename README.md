@@ -1,351 +1,381 @@
-# 🧠 NeuroCalm
+# NeuroCalm
 
 <div align="center">
 
-![NeuroCalm Banner](https://img.shields.io/badge/NeuroCalm-EEG%20Stress%20Detection-6366f1?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTkuNSAyQTIuNSAyLjUgMCAwIDEgMTIgNC41di4zYTEgMSAwIDAgMCAuNCAxYzEuMy45IDIuMSAyLjQgMi4xIDRhNS41IDUuNSAwIDEgMS0xMSAwYzAtMS42LjgtMy4xIDIuMS00YTEgMSAwIDAgMCAuNC0xdi0uM0EyLjUgMi41IDAgMCAxIDkuNSAyWiIvPjxwYXRoIGQ9Ik04IDIydi0yLjVhMi41IDIuNSAwIDAgMSA1IDBWMjIiLz48L3N2Zz4=)
+![NeuroCalm](https://img.shields.io/badge/NeuroCalm-fNIRS%20Workload%20Analysis-2563eb?style=for-the-badge)
+![Frontend](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-0f172a?style=for-the-badge&logo=react)
+![Backend](https://img.shields.io/badge/Backend-FastAPI-0f172a?style=for-the-badge&logo=fastapi)
+![Database](https://img.shields.io/badge/Database-PostgreSQL-0f172a?style=for-the-badge&logo=postgresql)
+![Model](https://img.shields.io/badge/Model-SALIENT-0f172a?style=for-the-badge)
 
-**AI-Powered EEG Stress Detection Platform**
+**A modern full-stack platform for fNIRS cognitive workload analysis**
 
-[![Python](https://img.shields.io/badge/Python-3.11+-3776ab?style=flat-square&logo=python&logoColor=white)](https://python.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
-[![React](https://img.shields.io/badge/React-18+-61dafb?style=flat-square&logo=react&logoColor=black)](https://reactjs.org)
-[![XGBoost](https://img.shields.io/badge/XGBoost-ML-ff6600?style=flat-square)](https://xgboost.readthedocs.io)
-[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
-
-[Live Demo](https://neurocalm.app) • [Documentation](docs/) • [API Reference](https://api.neurocalm.app/docs)
+Upload data, run model inference, inspect reports, manage users, and switch between mock/demo mode and live backend mode from the same product.
 
 </div>
 
 ---
 
-## 📖 Overview
+## ✨ What This Project Includes
 
-**NeuroCalm** is a full-stack web application that analyzes EEG (electroencephalogram) recordings to detect stress levels using machine learning. Users can upload their EEG files and receive instant, accurate stress analysis with detailed brain wave insights.
+NeuroCalm currently includes:
 
-### ✨ Key Features
-
-- 🧠 **AI-Powered Analysis** — XGBoost model with 87%+ accuracy trained on SAM40 dataset
-- 📤 **Easy File Upload** — Support for .mat, .edf, and .csv EEG formats
-- ⚡ **Fast Processing** — Results in under 30 seconds
-- 📊 **Detailed Reports** — Band power distribution (Delta, Theta, Alpha, Beta, Gamma)
-- 📈 **Analysis History** — Track stress patterns over time
-- 🔐 **Secure** — JWT authentication, encrypted data
-- 👨‍💼 **Admin Dashboard** — User management, system monitoring
+- 🖥️ A React + Vite frontend in `neurocalm-frontend`
+- ⚙️ A FastAPI backend in `neurocalm-backend`
+- 🗄️ PostgreSQL persistence
+- 🧠 A deployed SALIENT-style model, scaler, and metadata in `model`
+- 🧪 Raw and prepared dataset assets in `TestData`, `dataset`, `lite`, and `fNIRS-mental-workload-classifiers`
+- 🔐 Email/password login plus Google, GitHub, and Microsoft OAuth
+- 👤 User dashboard, uploads, history, reports, and settings
+- 🛠️ Admin dashboard, users, analyses, analytics, server, model, and system settings
+- 🎭 A frontend-wide mock/live toggle
+- 📈 Real model inference for model-ready CSV input
+- 🧬 An experimental raw-data preprocessing path for `.nir`, `.oxy`, and fnirSoft exports
 
 ---
 
-## 🖼️ Screenshots
+## 📸 UI Preview
 
 <div align="center">
-<table>
-<tr>
-<td><img src="docs/screenshots/landing.png" alt="Landing Page" width="400"/></td>
-<td><img src="docs/screenshots/dashboard.png" alt="Dashboard" width="400"/></td>
-</tr>
-<tr>
-<td align="center"><b>Landing Page</b></td>
-<td align="center"><b>User Dashboard</b></td>
-</tr>
-<tr>
-<td><img src="docs/screenshots/analysis.png" alt="Analysis Result" width="400"/></td>
-<td><img src="docs/screenshots/admin.png" alt="Admin Dashboard" width="400"/></td>
-</tr>
-<tr>
-<td align="center"><b>Analysis Result</b></td>
-<td align="center"><b>Admin Dashboard</b></td>
-</tr>
-</table>
+  <img src="screenshots/user_landing_page.png" alt="User Landing Page" width="45%" />
+  <img src="screenshots/user_Dashboard.png" alt="User Dashboard" width="45%" />
+</div>
+
+<div align="center">
+  <img src="screenshots/User_analysis_Results.png" alt="Analysis Results" width="45%" />
+  <img src="screenshots/Admin_Dashboard.png" alt="Admin Dashboard" width="45%" />
 </div>
 
 ---
 
-## 🏗️ Architecture
+## 🧱 Project Structure
 
-```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│                 │     │                 │     │                 │
-│  React Frontend │────▶│  FastAPI Backend│────▶│   PostgreSQL    │
-│  (Vite + Tailwind)    │  (REST API)     │     │   Database      │
-│                 │     │                 │     │                 │
-└─────────────────┘     └────────┬────────┘     └─────────────────┘
-                                 │
-                                 ▼
-                        ┌─────────────────┐
-                        │                 │
-                        │  ML Model       │
-                        │  (XGBoost)      │
-                        │                 │
-                        └─────────────────┘
-```
-
-### Tech Stack
-
-| Layer | Technology |
-|-------|------------|
-| **Frontend** | React 18, Vite, Tailwind CSS, Zustand, Framer Motion |
-| **Backend** | Python 3.11, FastAPI, SQLAlchemy, Alembic |
-| **ML Model** | XGBoost, Optuna, scikit-learn, SciPy |
-| **Database** | PostgreSQL 15 |
-| **Cache** | Redis (optional) |
-| **Deployment** | Docker, Docker Compose |
-
----
-
-## 📁 Project Structure
-
-```
-neurocalm/
-├── frontend/                 # React frontend application
-│   ├── src/
-│   │   ├── components/       # Reusable UI components
-│   │   ├── pages/            # Page components
-│   │   ├── services/         # API service layer
-│   │   ├── store/            # Zustand state management
-│   │   └── utils/            # Utility functions
-│   ├── package.json
-│   └── vite.config.js
-│
-├── backend/                  # FastAPI backend application
-│   ├── app/
-│   │   ├── api/v1/           # API endpoints
-│   │   ├── core/             # Security, config, exceptions
-│   │   ├── models/           # SQLAlchemy models
-│   │   ├── schemas/          # Pydantic schemas
-│   │   ├── services/         # Business logic
-│   │   ├── ml/               # ML model & inference
-│   │   └── db/               # Database configuration
-│   ├── tests/
-│   ├── requirements.txt
-│   └── Dockerfile
-│
-├── ml/                       # ML model training
-│   ├── notebooks/            # Jupyter notebooks
-│   ├── train_model.py        # Training script
-│   └── models/               # Trained model files
-│
-├── docker-compose.yml
+```text
+NeuroCalm/
+├── neurocalm-frontend/                 # React frontend
+├── neurocalm-backend/                  # FastAPI backend
+├── model/                              # deployed model, scaler, metadata, evaluation artifact
+├── TestData/                           # raw fNIRS test sessions
+├── dataset/                            # prepared sliding-window training data
+├── fNIRS-mental-workload-classifiers/  # Tufts reference repo copy
+├── lite/                               # training notebook assets
+├── docs/                               # notes, specs, and project docs
+├── screenshots/                        # UI screenshots
 └── README.md
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Current Tech Stack
 
-### Prerequisites
+| Layer | Stack |
+|-------|-------|
+| Frontend | React 19, Vite, Tailwind CSS, Zustand, Framer Motion |
+| Backend | FastAPI, SQLAlchemy, asyncpg, Pydantic Settings |
+| Database | PostgreSQL |
+| ML | TensorFlow CPU, scikit-learn, pandas, NumPy, SciPy |
+| Auth | JWT + Google/GitHub/Microsoft OAuth |
 
-- Python 3.11+
-- Node.js 18+
-- PostgreSQL 15+
-- Yarn or npm
+---
 
-### Quick Start with Docker
+## 🧩 Core Features
 
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/neurocalm.git
-cd neurocalm
+### 👤 User Experience
 
-# Start all services
-docker-compose up -d
+- Secure login and registration
+- Social sign-in with Google, GitHub, and Microsoft
+- File upload and workload analysis flow
+- Staged "thinking" progress experience during analysis
+- History search and filter tools
+- JSON and PDF report export
+- Settings page with profile, notification, and password flows
 
-# Access the application
-# Frontend: http://localhost:3000
-# Backend API: http://localhost:8000
-# API Docs: http://localhost:8000/api/docs
+### 🛠️ Admin Experience
+
+- Dashboard overview
+- User management with add-user flow
+- Soft delete behavior through `is_active = false`
+- Analysis monitoring
+- Analytics and server status
+- Model page with live metadata and subject evaluation scores
+- System settings controls
+
+### 🧠 ML / Data
+
+- SALIENT-style deployed model files included in the repo
+- Prepared training-style sliding-window dataset available
+- Experimental preprocessing bridge for raw fNIRS exports
+- CLI preprocessing support for test sessions
+
+---
+
+## ⚡ Quick Start
+
+### 1. Start the backend
+
+Recommended Python version on this machine: `3.12`
+
+```powershell
+cd C:\Users\BS01685.BS-01685\NeuroCalm\neurocalm-backend
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
 ```
 
-### Manual Setup
+If you want real model inference:
 
-#### Backend
+```powershell
+pip install -r requirements-ml.txt
+```
 
-```bash
-cd backend
+Create the env file:
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# or: venv\Scripts\activate  # Windows
+```powershell
+Copy-Item .env.example .env
+```
 
-# Install dependencies
-pip install -r requirements.txt
+Minimum env values:
 
-# Configure environment
-cp .env.example .env
-# Edit .env with your settings
+```env
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_DB=neurocalm
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=your-password
+SECRET_KEY=put-a-long-random-secret-here
+FRONTEND_URL=http://localhost:5173
+CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+```
 
-# Run database migrations
-alembic upgrade head
+For real model mode, keep:
 
-# Start the server
+```env
+MODEL_PATH=..\model\SALIENT_model.h5
+MODEL_TYPE=SALIENT
+SCALER_PATH=..\model\SALIENT_scaler.pkl
+MODEL_METADATA_PATH=..\model\deploy_metadata.json
+```
+
+Seed and run:
+
+```powershell
+python seed.py
 uvicorn app.main:app --reload
 ```
 
-#### Frontend
+Backend URLs:
 
-```bash
-cd frontend
+- `http://127.0.0.1:8000/`
+- `http://127.0.0.1:8000/health`
+- `http://127.0.0.1:8000/docs`
 
-# Install dependencies
-yarn install
+### 2. Start the frontend
 
-# Configure environment
-cp .env.example .env
+```powershell
+cd C:\Users\BS01685.BS-01685\NeuroCalm\neurocalm-frontend
+npm install
+npm run dev
+```
 
-# Start development server
-yarn dev
+Frontend env:
+
+```env
+VITE_API_URL=http://localhost:8000/api/v1
+VITE_APP_NAME=NeuroCalm
+```
+
+Frontend URL:
+
+- `http://localhost:5173`
+
+---
+
+## 🎭 Mock Mode vs Live Mode
+
+The frontend can switch between demo/mock data and the real backend.
+
+Edit:
+
+- `neurocalm-frontend/src/config/appConfig.js`
+
+Set:
+
+```js
+useMockDataEnabled: false
+```
+
+- `true` → mock auth, mock analyses, mock admin data
+- `false` → real API calls to the FastAPI backend
+
+This toggle is wired across:
+
+- auth
+- upload and analysis
+- history and reports
+- admin pages
+
+---
+
+## 🔐 Authentication
+
+Supported auth flows:
+
+- Email/password
+- Google OAuth
+- GitHub OAuth
+- Microsoft OAuth
+
+Backend OAuth env fields:
+
+```env
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+MICROSOFT_CLIENT_ID=
+MICROSOFT_CLIENT_SECRET=
+MICROSOFT_TENANT_ID=common
+```
+
+Local backend callback URLs:
+
+- `http://localhost:8000/api/v1/auth/oauth/google/callback`
+- `http://localhost:8000/api/v1/auth/oauth/github/callback`
+- `http://localhost:8000/api/v1/auth/oauth/microsoft/callback`
+
+Frontend callback route:
+
+- `http://localhost:5173/oauth/callback`
+
+---
+
+## 🧠 Model and Data
+
+### Deployed model assets
+
+The deployed model files live in `model/`:
+
+- `SALIENT_model.h5`
+- `SALIENT_scaler.pkl`
+- `deploy_metadata.json`
+- `results_30sec_150ts.pkl`
+
+### Training-style prepared data
+
+The training-style windowed data is under:
+
+- `dataset/slide_window_data/size_30sec_150ts_stride_03ts`
+
+Expected model feature columns:
+
+```text
+AB_I_O, AB_PHI_O, AB_I_DO, AB_PHI_DO,
+CD_I_O, CD_PHI_O, CD_I_DO, CD_PHI_DO
+```
+
+### Raw test data
+
+Raw sessions are under:
+
+- `TestData/`
+
+The backend currently supports two data paths:
+
+1. ✅ Exact model-ready CSV path
+   Already prepared 8-column CSV files can be windowed and predicted directly.
+
+2. ⚠️ Experimental raw-data path
+   Raw `.nir`, `.oxy`, and fnirSoft exports can be run through the backend's assumption-based preprocessing bridge.
+
+Important:
+The raw-data compatibility path is runnable, but it is still an approximation of the original Tufts upstream feature-generation step.
+
+### CLI preprocessing
+
+From `neurocalm-backend`:
+
+```powershell
+python preprocess_model_input.py "..\TestData\Subject 01"
+```
+
+Inspection-only mode:
+
+```powershell
+python preprocess_model_input.py "..\TestData" --report-only
 ```
 
 ---
 
-## 🔬 ML Model
+## 📡 API Overview
 
-The stress detection model is trained on the **SAM40 dataset** (40 subjects, 480 EEG recordings) using:
+Main API groups:
 
-- **Algorithm**: XGBoost with Optuna hyperparameter optimization
-- **Features**: 1,222 features extracted from 32-channel EEG
-  - Band powers (Delta, Theta, Alpha, Beta, Gamma)
-  - Band ratios
-  - Coherence features
-  - Hjorth parameters
-  - Spectral entropy
-- **Classification**: Binary (Relaxed vs Stressed)
-- **Accuracy**: 87%+ on test set
+- `/api/v1/auth`
+- `/api/v1/users`
+- `/api/v1/analysis`
+- `/api/v1/history`
+- `/api/v1/reports`
+- `/api/v1/admin`
 
-### Training Your Own Model
+Swagger docs:
 
-```bash
-cd ml
-
-# Train the model
-python train_model.py --data_path /path/to/eeg/data --output_dir ./models
-
-# The trained model will be saved as stress_detector_model.pkl
-```
+- `http://localhost:8000/docs`
 
 ---
 
-## 📡 API Endpoints
+## 📝 Important Notes
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/v1/auth/register` | Register new user |
-| `POST` | `/api/v1/auth/login` | Login, get JWT tokens |
-| `POST` | `/api/v1/analysis/upload` | Upload EEG file & analyze |
-| `GET` | `/api/v1/analysis/{id}` | Get analysis result |
-| `GET` | `/api/v1/history` | Get user's analysis history |
-| `GET` | `/api/v1/reports/{id}/pdf` | Download PDF report |
-| `GET` | `/api/v1/admin/stats` | System statistics (admin) |
-| `GET` | `/api/v1/admin/users` | List all users (admin) |
-
-Full API documentation available at `/api/docs` when running the backend.
+- Uploaded files are stored locally in the backend `uploads` directory.
+- Deleting an analysis removes its stored file from disk.
+- Deactivating a user is a soft delete, not a physical row delete.
+- Confidence shown to users is presentation-adjusted into the low 90s minimum range.
+- In mock mode, social login buttons show beta messaging; in live mode they use the real OAuth flow.
 
 ---
 
-## 🧪 Testing
+## 🌍 Free Deployment Recommendation
 
-### Backend Tests
+The easiest free setup for this repo is:
 
-```bash
-cd backend
+1. **Frontend:** Vercel
+2. **Backend:** Render
+3. **Database:** Neon
 
-# Run all tests
-pytest
+### Deployment flow
 
-# Run with coverage
-pytest --cov=app --cov-report=html
-```
+1. Push the repo to GitHub
+2. Create a Neon PostgreSQL database
+3. Deploy `neurocalm-backend` to Render
+4. Add Render env vars:
+   - `DATABASE_URL`
+   - `SECRET_KEY`
+   - `FRONTEND_URL`
+   - `CORS_ORIGINS`
+   - model paths
+5. Deploy `neurocalm-frontend` to Vercel
+6. Set `VITE_API_URL` in Vercel to your Render backend URL + `/api/v1`
+7. Update OAuth provider callback URLs to production backend URLs
+8. Seed the production database once
 
-### Frontend Tests
+### Free-tier caveats
 
-```bash
-cd frontend
-
-# Run tests
-yarn test
-
-# Run with coverage
-yarn test:coverage
-```
-
----
-
-## 🐳 Docker Deployment
-
-```yaml
-# docker-compose.yml
-version: '3.8'
-services:
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:3000"
-    depends_on:
-      - backend
-
-  backend:
-    build: ./backend
-    ports:
-      - "8000:8000"
-    environment:
-      - DATABASE_URL=postgresql://user:pass@db:5432/neurocalm
-    depends_on:
-      - db
-
-  db:
-    image: postgres:15-alpine
-    environment:
-      POSTGRES_DB: neurocalm
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-volumes:
-  postgres_data:
-```
+- Render free services sleep after idle time
+- Render filesystem is ephemeral, so uploads are not durable storage
+- TensorFlow cold starts can be slow on free infrastructure
 
 ---
 
-## 🤝 Contributing
+## 📚 Extra Reference Files
 
-Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+- `neurocalm-backend/README.md`
+- `neurocalm-frontend/README.md`
+- `deploy.md`
+- `docs/testdata_to_salient_mapping_spec.md`
+- `fNIRS-mental-workload-classifiers/`
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🙏 Acknowledgments
-
-- [SAM40 Dataset](https://www.example.com/sam40) - EEG stress dataset
-- [XGBoost](https://xgboost.readthedocs.io/) - ML framework
-- [FastAPI](https://fastapi.tiangolo.com/) - Backend framework
-- [React](https://reactjs.org/) - Frontend library
-
----
-
-## 📧 Contact
-
-**Project Maintainer**: Your Name
-
-- Email: hmjemima@gmail.com
-- LinkedIn: [Your Profile](https://www.linkedin.com/in/h-m-jemima-288563302/)
-
----
-
-<div align="center">
-
-**⭐ Star this repo if you find it useful!**
-
-Made with ❤️ for mental wellness
-
-</div>
+This project is licensed under the MIT License. See `LICENSE`.
