@@ -1,5 +1,5 @@
 from functools import lru_cache
-from urllib.parse import quote_plus
+from urllib.parse import parse_qsl, quote_plus, urlencode, urlsplit, urlunsplit
 
 from pydantic_settings import BaseSettings
 
@@ -51,20 +51,54 @@ class Settings(BaseSettings):
     def frontend_oauth_callback_url(self) -> str:
         return f"{self.FRONTEND_URL.rstrip('/')}/oauth/callback"
 
+    def _normalize_asyncpg_url(self, database_url: str) -> tuple[str, dict]:
+        connect_args: dict = {}
+
+        if not database_url.startswith("postgresql+asyncpg://"):
+            return database_url, connect_args
+
+        parsed = urlsplit(database_url)
+        query_pairs = parse_qsl(parsed.query, keep_blank_values=True)
+        filtered_pairs = []
+
+        for key, value in query_pairs:
+            if key == "sslmode":
+                # SQLAlchemy's asyncpg dialect forwards unknown query params as
+                # keyword args, but asyncpg expects SSL policy via "ssl".
+                connect_args["ssl"] = value
+                continue
+            filtered_pairs.append((key, value))
+
+        normalized_url = urlunsplit(
+            parsed._replace(query=urlencode(filtered_pairs, doseq=True))
+        )
+        return normalized_url, connect_args
+
     @property
     def database_url(self) -> str:
         if self.DATABASE_URL:
-            return self.DATABASE_URL
+            normalized_url, _ = self._normalize_asyncpg_url(self.DATABASE_URL)
+            return normalized_url
 
         user = quote_plus(self.POSTGRES_USER)
         password = quote_plus(self.POSTGRES_PASSWORD)
         host = self.POSTGRES_HOST.strip()
         database = self.POSTGRES_DB.strip()
 
-        return (
+        database_url = (
             f"postgresql+asyncpg://{user}:{password}"
             f"@{host}:{self.POSTGRES_PORT}/{database}"
         )
+        normalized_url, _ = self._normalize_asyncpg_url(database_url)
+        return normalized_url
+
+    @property
+    def database_connect_args(self) -> dict:
+        if self.DATABASE_URL:
+            _, connect_args = self._normalize_asyncpg_url(self.DATABASE_URL)
+            return connect_args
+
+        return {}
 
     class Config:
         env_file = ".env"
