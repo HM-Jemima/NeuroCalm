@@ -9,6 +9,7 @@ import Avatar from '../components/common/Avatar';
 import appConfig from '../config/appConfig';
 import { authService } from '../services/authService';
 import useAuthStore from '../store/authStore';
+import useSidebarStore from '../store/sidebarStore';
 import useToastStore from '../store/toastStore';
 
 const DEFAULT_NOTIFICATIONS = {
@@ -19,6 +20,7 @@ const DEFAULT_NOTIFICATIONS = {
 
 export default function SettingsPage() {
   const { user, setUser } = useAuthStore();
+  const isSidebarCollapsed = useSidebarStore((state) => state.isCollapsed);
   const [activeTab, setActiveTab] = useState('profile');
   const showToast = useToastStore((state) => state.showToast);
 
@@ -265,7 +267,7 @@ export default function SettingsPage() {
     <div className="min-h-screen bg-bg-primary">
       <Sidebar />
 
-      <main className="ml-[260px] p-8">
+      <main className={`p-8 transition-all duration-300 ${isSidebarCollapsed ? 'ml-[92px]' : 'ml-[260px]'}`}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

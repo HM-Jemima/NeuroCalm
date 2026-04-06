@@ -10,6 +10,7 @@ import AnalysisResult from '../components/dashboard/AnalysisResult';
 import BandPowerChart from '../components/dashboard/BandPowerChart';
 import HistoryTable from '../components/dashboard/HistoryTable';
 import useAuthStore from '../store/authStore';
+import useSidebarStore from '../store/sidebarStore';
 import { useAnalysis } from '../hooks/useAnalysis';
 import { formatDate } from '../utils/helpers';
 import { getAnalysisBandPowers } from '../utils/analysisPresentation';
@@ -86,6 +87,7 @@ const fadeUp = {
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
+  const isSidebarCollapsed = useSidebarStore((state) => state.isCollapsed);
   const {
     currentAnalysis,
     isAnalyzing,
@@ -121,7 +123,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-bg-primary">
       <Sidebar />
 
-      <main className="ml-[260px] p-8">
+      <main className={`p-8 transition-all duration-300 ${isSidebarCollapsed ? 'ml-[92px]' : 'ml-[260px]'}`}>
         <motion.div
           variants={container}
           initial="initial"
