@@ -28,7 +28,7 @@ async def save_upload(file_content: bytes, filename: str) -> str:
 async def run_analysis(db: AsyncSession, user: User, filename: str, file_path: str) -> Analysis:
     """Run fNIRS/EEG analysis on the uploaded file and persist the result."""
     if not validate_file(filename):
-        raise ValueError("Unsupported file format. Use .mat, .edf, or .csv")
+        raise ValueError("Unsupported file format. Use .csv, .nir, .oxy, .mat, or .edf")
 
     result = predict_stress(file_path)
 

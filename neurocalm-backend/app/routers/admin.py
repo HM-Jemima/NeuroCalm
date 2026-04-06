@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.user import User
 from app.schemas.analysis import AdminStats, ModelInfoOut
-from app.schemas.user import AdminUserOut, AdminUserUpdate
+from app.schemas.user import AdminUserOut, AdminUserUpdate, AdminUserCreate
 from app.schemas.admin import (
     AdminAnalysesResponse,
     AnalyticsResponse,
@@ -16,6 +16,7 @@ from app.utils.dependencies import get_admin_user
 from app.services.admin_service import (
     get_system_stats,
     get_all_users,
+    create_user,
     update_user,
     delete_user,
     get_model_info,
@@ -53,6 +54,18 @@ async def list_users(
 ):
     users, _ = await get_all_users(db, page, page_size)
     return users
+
+
+@router.post("/users", response_model=AdminUserOut, status_code=status.HTTP_201_CREATED)
+async def create_user_endpoint(
+    data: AdminUserCreate,
+    admin: User = Depends(get_admin_user),
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        return await create_user(db, data.model_dump())
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
 
 
 @router.put("/users/{user_id}", response_model=AdminUserOut)

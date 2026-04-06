@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.user import User
 from app.schemas.analysis import HistoryResponse, AnalysisHistoryItem
+from app.utils.confidence import get_display_confidence
 from app.utils.dependencies import get_current_user
 from app.services.analysis_service import get_history
 
@@ -25,7 +26,12 @@ async def get_analysis_history(
                 id=a.id,
                 filename=a.filename,
                 stress_score=a.stress_score,
-                confidence=a.confidence,
+                confidence=get_display_confidence(
+                    a.confidence,
+                    stress_score=a.stress_score,
+                    workload_class=a.workload_class,
+                    features_count=a.features_count,
+                ),
                 created_at=a.created_at,
                 user_name=a.user.full_name,
                 user_email=a.user.email,

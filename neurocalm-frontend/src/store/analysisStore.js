@@ -9,7 +9,11 @@ const useAnalysisStore = create((set) => ({
   setCurrentAnalysis: (analysis) => set({ currentAnalysis: analysis }),
   setAnalyzing: (isAnalyzing) => set({ isAnalyzing }),
   setProgress: (uploadProgress) => set({ uploadProgress }),
-  setHistory: (history) => set({ history }),
+  setHistory: (historyOrUpdater) => set((state) => ({
+    history: typeof historyOrUpdater === 'function'
+      ? historyOrUpdater(state.history)
+      : historyOrUpdater,
+  })),
   clearAnalysis: () => set({ currentAnalysis: null, isAnalyzing: false, uploadProgress: 0 }),
 }));
 

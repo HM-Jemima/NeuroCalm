@@ -18,6 +18,14 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = "uploads"
     MAX_UPLOAD_SIZE_MB: int = 50
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
+    FRONTEND_URL: str = "http://localhost:5173"
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+    GITHUB_CLIENT_ID: str = ""
+    GITHUB_CLIENT_SECRET: str = ""
+    MICROSOFT_CLIENT_ID: str = ""
+    MICROSOFT_CLIENT_SECRET: str = ""
+    MICROSOFT_TENANT_ID: str = "common"
 
     # ML Model settings
     MODEL_PATH: str = ""  # Path to exported Keras model (.h5 or SavedModel dir)
@@ -38,6 +46,10 @@ class Settings(BaseSettings):
     @property
     def fnirs_feature_list(self) -> list[str]:
         return [f.strip() for f in self.FNIRS_FEATURES.split(",")]
+
+    @property
+    def frontend_oauth_callback_url(self) -> str:
+        return f"{self.FRONTEND_URL.rstrip('/')}/oauth/callback"
 
     @property
     def database_url(self) -> str:

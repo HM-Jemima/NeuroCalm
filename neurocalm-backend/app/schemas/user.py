@@ -7,6 +7,7 @@ class UserOut(BaseModel):
     email: str
     full_name: str
     role: str
+    auth_provider: str = "local"
     is_active: bool
     created_at: datetime
 
@@ -31,6 +32,14 @@ class AdminUserUpdate(BaseModel):
     email: EmailStr | None = None
     role: str | None = None
     is_active: bool | None = None
+
+
+class AdminUserCreate(BaseModel):
+    email: EmailStr
+    full_name: str
+    password: str
+    role: str = "user"
+    is_active: bool = True
 
 
 class AdminUserOut(UserOut):

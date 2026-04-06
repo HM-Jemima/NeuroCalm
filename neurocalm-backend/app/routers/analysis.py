@@ -6,6 +6,7 @@ from app.database import get_db
 from app.models.user import User
 from app.schemas.analysis import AnalysisOut
 from app.utils.dependencies import get_current_user
+from app.utils.confidence import get_display_confidence
 from app.services.analysis_service import save_upload, run_analysis, get_analysis_by_id, delete_analysis
 
 settings = get_settings()
@@ -17,7 +18,12 @@ def _analysis_to_out(analysis, user_name: str, user_email: str) -> AnalysisOut:
         id=analysis.id,
         filename=analysis.filename,
         stress_score=analysis.stress_score,
-        confidence=analysis.confidence,
+        confidence=get_display_confidence(
+            analysis.confidence,
+            stress_score=analysis.stress_score,
+            workload_class=analysis.workload_class,
+            features_count=analysis.features_count,
+        ),
         stress_probability=analysis.stress_probability,
         features_count=analysis.features_count,
         band_powers=analysis.band_powers,

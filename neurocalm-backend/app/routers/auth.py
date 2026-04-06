@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -12,6 +13,12 @@ from app.services.auth_service import (
     refresh_access_token,
     create_password_reset,
     reset_password,
+)
+from app.services.oauth_service import (
+    OAuthFlowError,
+    build_frontend_oauth_redirect,
+    build_oauth_authorize_url,
+    get_or_create_oauth_user,
 )
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -37,8 +44,55 @@ async def login(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
         )
-    tokens = generate_tokens(user)
+    tokens = generate_tokens(user, "local")
     return tokens
+
+
+@router.get("/oauth/{provider}/start")
+async def oauth_start(provider: str, request: Request):
+    callback_url = str(request.url_for("oauth_callback", provider=provider))
+
+    try:
+        authorize_url = build_oauth_authorize_url(provider, callback_url)
+    except OAuthFlowError as exc:
+        return RedirectResponse(build_frontend_oauth_redirect(error=str(exc)))
+
+    return RedirectResponse(authorize_url)
+
+
+@router.get("/oauth/{provider}/callback", name="oauth_callback")
+async def oauth_callback(
+    provider: str,
+    request: Request,
+    code: str | None = None,
+    state: str | None = None,
+    error: str | None = None,
+    error_description: str | None = None,
+    db: AsyncSession = Depends(get_db),
+):
+    if error:
+        message = error_description or error.replace("_", " ")
+        return RedirectResponse(build_frontend_oauth_redirect(error=message))
+
+    if not code or not state:
+        return RedirectResponse(
+            build_frontend_oauth_redirect(error="OAuth login was cancelled or incomplete.")
+        )
+
+    callback_url = str(request.url_for("oauth_callback", provider=provider))
+
+    try:
+        user = await get_or_create_oauth_user(db, provider, code, state, callback_url)
+        tokens = generate_tokens(user, provider.lower())
+    except OAuthFlowError as exc:
+        return RedirectResponse(build_frontend_oauth_redirect(error=str(exc)))
+
+    return RedirectResponse(
+        build_frontend_oauth_redirect(
+            access_token=tokens["access_token"],
+            refresh_token=tokens["refresh_token"],
+        )
+    )
 
 
 @router.post("/refresh", response_model=LoginResponse)

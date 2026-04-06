@@ -35,8 +35,8 @@ async def seed():
 
         # Create admin user
         admin = User(
-            email="admin@neurocalm.com",
-            full_name="Dr. Sarah Admin",
+            email="hmJemima@gmail.com",
+            full_name="HM Jemima",
             password_hash=hash_password("admin123"),
             role="admin",
             is_active=True,
@@ -45,8 +45,8 @@ async def seed():
 
         # Create regular user
         user = User(
-            email="user@neurocalm.com",
-            full_name="John Doe",
+            email="sazid@gmail.com",
+            full_name="Sazid Khan",
             password_hash=hash_password("user123"),
             role="user",
             is_active=True,

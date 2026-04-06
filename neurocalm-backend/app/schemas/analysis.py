@@ -75,3 +75,11 @@ class ModelInfoOut(BaseModel):
     features: str
     training_data: str
     last_updated: str
+    f1_score: str | None = None
+    kappa: str | None = None
+    timesteps: int | None = None
+    n_channels: int | None = None
+    n_classes: int | None = None
+    feature_cols: list[str] = []
+    evaluation_timestamp: str | None = None
+    evaluation_subjects: list[dict] = []

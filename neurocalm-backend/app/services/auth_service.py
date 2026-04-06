@@ -38,9 +38,9 @@ async def authenticate_user(db: AsyncSession, email: str, password: str) -> User
     return user
 
 
-def generate_tokens(user: User) -> dict:
-    access_token = create_access_token(user.id, user.role)
-    refresh_token = create_refresh_token(user.id, user.role)
+def generate_tokens(user: User, auth_provider: str = "local") -> dict:
+    access_token = create_access_token(user.id, user.role, auth_provider)
+    refresh_token = create_refresh_token(user.id, user.role, auth_provider)
     return {
         "access_token": access_token,
         "refresh_token": refresh_token,
@@ -59,7 +59,8 @@ async def refresh_access_token(db: AsyncSession, refresh_token: str) -> dict | N
     if user is None or not user.is_active:
         return None
 
-    return generate_tokens(user)
+    auth_provider = payload.get("auth_provider") or getattr(user, "auth_provider", "local")
+    return generate_tokens(user, auth_provider)
 
 
 async def create_password_reset(db: AsyncSession, email: str) -> str | None:

@@ -9,7 +9,9 @@ const useAuthStore = create((set) => ({
   logout: () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
-    set({ user: null, isAuthenticated: false });
+    localStorage.removeItem('neurocalm_user');
+    localStorage.removeItem('neurocalm_pending_oauth_provider');
+    set({ user: null, isAuthenticated: false, isLoading: false });
   },
   setLoading: (isLoading) => set({ isLoading }),
 }));

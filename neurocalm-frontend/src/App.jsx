@@ -3,6 +3,7 @@ import { useAuth } from './hooks/useAuth';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import AdminRoute from './components/common/AdminRoute';
 import LoadingSpinner from './components/common/LoadingSpinner';
+import ToastViewport from './components/common/ToastViewport';
 
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
@@ -16,6 +17,7 @@ import HelpPage from './pages/HelpPage';
 import PricingPage from './pages/PricingPage';
 import ResearchPage from './pages/ResearchPage';
 import ContactPage from './pages/ContactPage';
+import OAuthCallbackPage from './pages/OAuthCallbackPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
@@ -41,6 +43,7 @@ function AppContent() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+      <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
       <Route path="/pricing" element={<PricingPage />} />
       <Route path="/research" element={<ResearchPage />} />
       <Route path="/contact" element={<ContactPage />} />
@@ -76,6 +79,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AppContent />
+      <ToastViewport />
     </BrowserRouter>
   );
 }

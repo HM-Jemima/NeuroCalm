@@ -1,14 +1,15 @@
 import { motion } from 'framer-motion';
-import { Brain, FileText, Zap, Shield, Clock } from 'lucide-react';
+import { FileText, Zap, Shield, Clock } from 'lucide-react';
 import Sidebar from '../components/layout/Sidebar';
 import Card from '../components/common/Card';
 import UploadZone from '../components/dashboard/UploadZone';
 import AnalysisResult from '../components/dashboard/AnalysisResult';
 import BandPowerChart from '../components/dashboard/BandPowerChart';
 import { useAnalysis } from '../hooks/useAnalysis';
+import appConfig from '../config/appConfig';
 
 const tips = [
-  { icon: FileText, title: 'Supported Formats', desc: 'Upload .mat, .edf, or .csv EEG files for analysis.' },
+  { icon: FileText, title: 'Supported Formats', desc: 'Upload .mat, .edf, .csv, .nir, or .oxy files. In live model mode, model-ready CSV is the fully supported path.' },
   { icon: Zap, title: 'Fast Processing', desc: 'AI analysis completes in under 30 seconds.' },
   { icon: Shield, title: 'Secure Upload', desc: 'Your data is encrypted and processed securely.' },
   { icon: Clock, title: 'Auto-Saved', desc: 'All results are saved to your history automatically.' },
@@ -38,22 +39,23 @@ export default function NewAnalysisPage() {
           animate="animate"
           className="space-y-8"
         >
-          {/* Header */}
           <motion.div variants={fadeUp}>
             <h1 className="text-2xl font-display font-bold text-text-primary">
               New Analysis
             </h1>
             <p className="text-sm text-text-secondary mt-1">
-              Upload an EEG recording to get instant AI-powered stress detection
+              Upload a brain-signal file and choose how you want the analysis experience to feel
+            </p>
+            <p className="text-xs text-text-muted mt-2">
+              Current data mode: {appConfig.useMockDataEnabled ? 'Mock frontend data' : 'Live backend data'}
             </p>
           </motion.div>
 
-          {/* Upload + Tips */}
           <motion.div variants={fadeUp} className="grid grid-cols-[1fr_380px] gap-6">
             <Card hover={false}>
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-lg font-semibold font-display text-text-primary">
-                  Upload EEG File
+                  Upload Analysis File
                 </h3>
                 {currentAnalysis && (
                   <button
@@ -68,6 +70,7 @@ export default function NewAnalysisPage() {
                 onAnalyze={uploadAndAnalyze}
                 isAnalyzing={isAnalyzing}
                 uploadProgress={uploadProgress}
+                resultId={currentAnalysis?.id}
               />
             </Card>
 
@@ -88,7 +91,6 @@ export default function NewAnalysisPage() {
             </div>
           </motion.div>
 
-          {/* Results */}
           {currentAnalysis && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -118,6 +120,11 @@ export default function NewAnalysisPage() {
                     <p className="text-xs text-text-muted mt-1">
                       {currentAnalysis.features_count?.toLocaleString()} features extracted
                     </p>
+                    {currentAnalysis.analysis_mode && (
+                      <p className="text-xs text-text-muted mt-3">
+                        Selected mode: <span className="text-text-primary">{currentAnalysis.analysis_mode}</span>
+                      </p>
+                    )}
                   </div>
                 </Card>
               </div>
