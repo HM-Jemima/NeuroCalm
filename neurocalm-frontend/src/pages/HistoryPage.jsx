@@ -9,6 +9,7 @@ import AnalysisResult from '../components/dashboard/AnalysisResult';
 import BandPowerChart from '../components/dashboard/BandPowerChart';
 import { useAnalysis } from '../hooks/useAnalysis';
 import useAuthStore from '../store/authStore';
+import useSidebarStore from '../store/sidebarStore';
 import { formatDate, getStressLevel } from '../utils/helpers';
 import { getAnalysisBandPowers } from '../utils/analysisPresentation';
 
@@ -74,6 +75,7 @@ function matchesDateRange(dateValue, range) {
 
 export default function HistoryPage() {
   const { user } = useAuthStore();
+  const isSidebarCollapsed = useSidebarStore((state) => state.isCollapsed);
   const {
     history,
     fetchHistory,
@@ -142,7 +144,7 @@ export default function HistoryPage() {
     <div className="min-h-screen bg-bg-primary">
       <Sidebar />
 
-      <main className="ml-[260px] p-8">
+      <main className={`p-8 transition-all duration-300 ${isSidebarCollapsed ? 'ml-[92px]' : 'ml-[260px]'}`}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
