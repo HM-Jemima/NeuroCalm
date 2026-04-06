@@ -1,13 +1,35 @@
 import { Eye, Download, Trash2, FileText, CheckCircle, AlertCircle } from 'lucide-react';
 import Avatar from '../common/Avatar';
 import { formatDate } from '../../utils/helpers';
+import { getStressLevel } from '../../utils/helpers';
 
-export default function HistoryTable({ items = [], onView, onDownload, onDelete }) {
+const LEVEL_STYLES = {
+  Relaxed: {
+    className: 'bg-accent-green/10 text-accent-green',
+    Icon: CheckCircle,
+  },
+  Moderate: {
+    className: 'bg-amber-400/10 text-amber-300',
+    Icon: AlertCircle,
+  },
+  Stressed: {
+    className: 'bg-accent-red/10 text-accent-red',
+    Icon: AlertCircle,
+  },
+};
+
+export default function HistoryTable({
+  items = [],
+  onView,
+  onDownload,
+  onDelete,
+  emptyMessage = 'No analyses yet. Upload your first EEG file!',
+}) {
   if (items.length === 0) {
     return (
       <div className="text-center py-12">
         <FileText size={48} className="mx-auto text-text-muted mb-3 opacity-50" />
-        <p className="text-text-secondary text-sm">No analyses yet. Upload your first EEG file!</p>
+        <p className="text-text-secondary text-sm">{emptyMessage}</p>
       </div>
     );
   }
@@ -29,7 +51,9 @@ export default function HistoryTable({ items = [], onView, onDownload, onDelete 
         </thead>
         <tbody>
           {items.map((item) => {
-            const isRelaxed = (item.stress_score ?? item.score ?? 0) <= 40;
+            const stressLevel = getStressLevel(item.stress_score ?? item.score ?? 0);
+            const levelStyle = LEVEL_STYLES[stressLevel.label] || LEVEL_STYLES.Stressed;
+            const LevelIcon = levelStyle.Icon;
             return (
               <tr
                 key={item.id}
@@ -57,14 +81,10 @@ export default function HistoryTable({ items = [], onView, onDownload, onDelete 
                 </td>
                 <td className="py-3 px-4">
                   <span
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
-                      isRelaxed
-                        ? 'bg-accent-green/10 text-accent-green'
-                        : 'bg-accent-red/10 text-accent-red'
-                    }`}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${levelStyle.className}`}
                   >
-                    {isRelaxed ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
-                    {isRelaxed ? 'Relaxed' : 'Stressed'}
+                    <LevelIcon size={12} />
+                    {stressLevel.label}
                   </span>
                 </td>
                 <td className="py-3 px-4 text-sm text-text-primary">

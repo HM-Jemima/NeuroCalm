@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, FileText, Download } from 'lucide-react';
+import { Search, Filter, FileText, Download, X } from 'lucide-react';
 import Sidebar from '../components/layout/Sidebar';
 import Card from '../components/common/Card';
 import Modal from '../components/common/Modal';
@@ -9,8 +9,68 @@ import AnalysisResult from '../components/dashboard/AnalysisResult';
 import BandPowerChart from '../components/dashboard/BandPowerChart';
 import { useAnalysis } from '../hooks/useAnalysis';
 import useAuthStore from '../store/authStore';
-import { formatDate } from '../utils/helpers';
+import { formatDate, getStressLevel } from '../utils/helpers';
 import { getAnalysisBandPowers } from '../utils/analysisPresentation';
+
+const RESULT_FILTERS = [
+  { value: 'all', label: 'All Results' },
+  { value: 'relaxed', label: 'Relaxed' },
+  { value: 'moderate', label: 'Moderate' },
+  { value: 'stressed', label: 'Stressed' },
+];
+
+const DATE_FILTERS = [
+  { value: 'all', label: 'Any Time' },
+  { value: 'today', label: 'Today' },
+  { value: '7d', label: 'Last 7 Days' },
+  { value: '30d', label: 'Last 30 Days' },
+  { value: '90d', label: 'Last 90 Days' },
+];
+
+const FILE_TYPE_FILTERS = [
+  { value: 'all', label: 'All Types' },
+  { value: '.csv', label: 'CSV' },
+  { value: '.nir', label: 'NIR' },
+  { value: '.oxy', label: 'OXY' },
+  { value: '.mat', label: 'MAT' },
+  { value: '.edf', label: 'EDF' },
+];
+
+function getFileExtension(filename = '') {
+  const dotIndex = filename.lastIndexOf('.');
+  if (dotIndex < 0) {
+    return '';
+  }
+  return filename.slice(dotIndex).toLowerCase();
+}
+
+function matchesDateRange(dateValue, range) {
+  if (range === 'all') {
+    return true;
+  }
+
+  const createdAt = new Date(dateValue);
+  if (Number.isNaN(createdAt.getTime())) {
+    return false;
+  }
+
+  const now = new Date();
+  if (range === 'today') {
+    return createdAt.toDateString() === now.toDateString();
+  }
+
+  const rangeToDays = {
+    '7d': 7,
+    '30d': 30,
+    '90d': 90,
+  };
+  const days = rangeToDays[range];
+  if (!days) {
+    return true;
+  }
+
+  return now.getTime() - createdAt.getTime() <= days * 24 * 60 * 60 * 1000;
+}
 
 export default function HistoryPage() {
   const { user } = useAuthStore();
@@ -23,6 +83,10 @@ export default function HistoryPage() {
   } = useAnalysis();
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState(null);
+  const [showFilters, setShowFilters] = useState(false);
+  const [resultFilter, setResultFilter] = useState('all');
+  const [dateFilter, setDateFilter] = useState('all');
+  const [fileTypeFilter, setFileTypeFilter] = useState('all');
 
   useEffect(() => {
     fetchHistory().catch(() => {});
@@ -39,10 +103,40 @@ export default function HistoryPage() {
     }
   };
 
+  const activeFilterCount = [resultFilter, dateFilter, fileTypeFilter].filter((value) => value !== 'all').length;
+
   const filteredHistory = history.filter((item) => {
-    const name = item.filename || item.file_name || '';
-    return name.toLowerCase().includes(search.toLowerCase());
+    const filename = item.filename || item.file_name || '';
+    const stressLevel = getStressLevel(item.stress_score ?? item.score ?? 0).label.toLowerCase();
+    const query = search.trim().toLowerCase();
+    const searchHaystack = [
+      filename,
+      item.user_name || '',
+      item.user_email || '',
+      formatDate(item.created_at || item.date || ''),
+      stressLevel,
+    ]
+      .join(' ')
+      .toLowerCase();
+
+    if (query && !searchHaystack.includes(query)) {
+      return false;
+    }
+
+    if (resultFilter !== 'all' && stressLevel !== resultFilter) {
+      return false;
+    }
+
+    if (fileTypeFilter !== 'all' && getFileExtension(filename) !== fileTypeFilter) {
+      return false;
+    }
+
+    return matchesDateRange(item.created_at || item.date, dateFilter);
   });
+
+  const emptyMessage = history.length === 0
+    ? 'No analyses yet. Upload your first EEG file!'
+    : 'No analyses match your current search or filters.';
 
   return (
     <div className="min-h-screen bg-bg-primary">
@@ -73,10 +167,122 @@ export default function HistoryPage() {
                 className="w-full pl-9 pr-4 py-2.5 bg-bg-glass border border-border-color rounded-xl text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-blue"
               />
             </div>
-            <button className="flex items-center gap-2 px-4 py-2.5 bg-bg-glass border border-border-color rounded-xl text-sm text-text-secondary hover:border-accent-blue/30 transition-all">
+            <button
+              onClick={() => setShowFilters((value) => !value)}
+              className={`flex items-center gap-2 px-4 py-2.5 bg-bg-glass border rounded-xl text-sm transition-all ${
+                showFilters || activeFilterCount > 0
+                  ? 'border-accent-blue/40 text-accent-blue'
+                  : 'border-border-color text-text-secondary hover:border-accent-blue/30'
+              }`}
+            >
               <Filter size={16} />
               Filters
+              {activeFilterCount > 0 && (
+                <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-accent-blue px-1.5 py-0.5 text-[11px] font-semibold text-white">
+                  {activeFilterCount}
+                </span>
+              )}
             </button>
+          </div>
+
+          {showFilters && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <Card hover={false}>
+                <div className="flex flex-wrap items-start gap-6">
+                  <div className="space-y-3">
+                    <p className="text-[11px] uppercase tracking-wider text-text-muted">Result</p>
+                    <div className="flex flex-wrap gap-2">
+                      {RESULT_FILTERS.map((option) => (
+                        <button
+                          key={option.value}
+                          onClick={() => setResultFilter(option.value)}
+                          className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
+                            resultFilter === option.value
+                              ? 'bg-accent-blue text-white'
+                              : 'border border-border-color bg-bg-glass text-text-secondary hover:border-accent-blue/30'
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <p className="text-[11px] uppercase tracking-wider text-text-muted">Date Range</p>
+                    <div className="flex flex-wrap gap-2">
+                      {DATE_FILTERS.map((option) => (
+                        <button
+                          key={option.value}
+                          onClick={() => setDateFilter(option.value)}
+                          className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
+                            dateFilter === option.value
+                              ? 'bg-accent-blue text-white'
+                              : 'border border-border-color bg-bg-glass text-text-secondary hover:border-accent-blue/30'
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <p className="text-[11px] uppercase tracking-wider text-text-muted">File Type</p>
+                    <div className="flex flex-wrap gap-2">
+                      {FILE_TYPE_FILTERS.map((option) => (
+                        <button
+                          key={option.value}
+                          onClick={() => setFileTypeFilter(option.value)}
+                          className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
+                            fileTypeFilter === option.value
+                              ? 'bg-accent-blue text-white'
+                              : 'border border-border-color bg-bg-glass text-text-secondary hover:border-accent-blue/30'
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setResultFilter('all');
+                      setDateFilter('all');
+                      setFileTypeFilter('all');
+                    }}
+                    className="ml-auto inline-flex items-center gap-2 rounded-xl border border-border-color px-3 py-2 text-sm text-text-secondary transition-all hover:border-accent-blue/30 hover:text-text-primary"
+                  >
+                    <X size={14} />
+                    Clear filters
+                  </button>
+                </div>
+              </Card>
+            </motion.div>
+          )}
+
+          <div className="flex items-center justify-between px-1">
+            <p className="text-sm text-text-secondary">
+              Showing <span className="font-semibold text-text-primary">{filteredHistory.length}</span> of{' '}
+              <span className="font-semibold text-text-primary">{history.length}</span> analyses
+            </p>
+            {(search || activeFilterCount > 0) && (
+              <button
+                onClick={() => {
+                  setSearch('');
+                  setResultFilter('all');
+                  setDateFilter('all');
+                  setFileTypeFilter('all');
+                }}
+                className="text-sm text-accent-blue transition-colors hover:text-accent-cyan"
+              >
+                Reset view
+              </button>
+            )}
           </div>
 
           <Card hover={false}>
@@ -85,6 +291,7 @@ export default function HistoryPage() {
               onView={handleView}
               onDownload={(item) => downloadReportJson(item.id, item)}
               onDelete={deleteAnalysis}
+              emptyMessage={emptyMessage}
             />
           </Card>
         </motion.div>
