@@ -128,10 +128,10 @@ pip install -r requirements-ml.txt
 2. Fill these values in `.env`:
 
 ```env
-MODEL_PATH=path\to\model.h5
+MODEL_PATH=model/SALIENT_model.h5
 MODEL_TYPE=SALIENT
-SCALER_PATH=path\to\scaler.pkl
-MODEL_METADATA_PATH=path\to\model_metadata.json
+SCALER_PATH=model/SALIENT_scaler.pkl
+MODEL_METADATA_PATH=model/deploy_metadata.json
 ```
 
 ## Model-compatible preprocessing

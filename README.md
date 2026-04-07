@@ -151,10 +151,10 @@ CORS_ORIGINS=http://localhost:5173,http://localhost:3000
 For real model mode, keep:
 
 ```env
-MODEL_PATH=..\model\SALIENT_model.h5
+MODEL_PATH=model/SALIENT_model.h5
 MODEL_TYPE=SALIENT
-SCALER_PATH=..\model\SALIENT_scaler.pkl
-MODEL_METADATA_PATH=..\model\deploy_metadata.json
+SCALER_PATH=model/SALIENT_scaler.pkl
+MODEL_METADATA_PATH=model/deploy_metadata.json
 ```
 
 Seed and run:
