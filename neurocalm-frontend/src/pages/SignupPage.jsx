@@ -63,8 +63,8 @@ export default function SignupPage() {
       </div>
 
       {/* Right Panel - Form */}
-      <div className="flex-1 flex items-center justify-center p-8 relative z-10">
-        <div className="w-full max-w-md bg-bg-secondary/80 backdrop-blur-[20px] border border-border-color rounded-2xl p-8">
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-8 relative z-10">
+        <div className="w-full max-w-md bg-bg-secondary/80 backdrop-blur-[20px] border border-border-color rounded-2xl p-5 sm:p-8">
           {error && (
             <div className="mb-4 p-3 bg-accent-red/10 border border-accent-red/20 rounded-xl text-sm text-accent-red">
               {error}

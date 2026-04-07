@@ -52,9 +52,9 @@ export default function AdminModel() {
     <div className="min-h-screen bg-bg-primary">
       <AdminSidebar />
 
-      <main className={`p-8 transition-all duration-300 ${isSidebarCollapsed ? 'ml-[92px]' : 'ml-[260px]'}`}>
+      <main className={`px-4 py-6 pb-28 sm:px-6 md:p-8 md:pb-8 transition-all duration-300 ${isSidebarCollapsed ? 'md:ml-[92px]' : 'md:ml-[260px]'}`}>
         <motion.div variants={container} initial="initial" animate="animate" className="space-y-6">
-          <motion.div variants={fadeUp} className="flex items-center justify-between">
+          <motion.div variants={fadeUp} className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-2xl font-display font-bold text-text-primary">ML Model</h1>
               <p className="text-sm text-text-secondary mt-1">
@@ -73,7 +73,7 @@ export default function AdminModel() {
             </motion.p>
           )}
 
-          <motion.div variants={fadeUp} className="grid grid-cols-4 gap-4">
+          <motion.div variants={fadeUp} className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {modelMetrics.map((metric) => (
               <Card key={metric.label} hover={false}>
                 <div className="flex items-center gap-3">
@@ -94,7 +94,7 @@ export default function AdminModel() {
               <h3 className="text-lg font-semibold font-display text-text-primary mb-4">
                 Active Model
               </h3>
-              <div className="grid grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                 {[
                   { label: 'Model Type', value: modelInfo?.model_type || 'Random Forest' },
                   { label: 'Version', value: modelInfo?.version || 'v2.1.0' },
@@ -148,36 +148,38 @@ export default function AdminModel() {
                   <h3 className="text-lg font-semibold font-display text-text-primary mb-4">
                     Training History
                   </h3>
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-border-color">
-                        <th className="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase tracking-wider">Version</th>
-                        <th className="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase tracking-wider">Date</th>
-                        <th className="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase tracking-wider">Accuracy</th>
-                        <th className="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase tracking-wider">Samples</th>
-                        <th className="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase tracking-wider">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {trainingHistory.map((trainingRun) => (
-                        <tr key={trainingRun.version} className="border-b border-border-color/50 hover:bg-bg-glass/50 transition-colors">
-                          <td className="py-3 px-4 text-sm text-text-primary font-mono">{trainingRun.version}</td>
-                          <td className="py-3 px-4 text-sm text-text-secondary">{trainingRun.date}</td>
-                          <td className="py-3 px-4 text-sm text-text-primary font-medium">{trainingRun.accuracy}</td>
-                          <td className="py-3 px-4 text-sm text-text-secondary">{trainingRun.samples}</td>
-                          <td className="py-3 px-4">
-                            <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-                              trainingRun.status === 'active'
-                                ? 'bg-accent-green/10 text-accent-green'
-                                : 'bg-bg-glass text-text-muted'
-                            }`}>
-                              {trainingRun.status}
-                            </span>
-                          </td>
+                  <div className="overflow-x-auto">
+                    <table className="w-full min-w-[640px]">
+                      <thead>
+                        <tr className="border-b border-border-color">
+                          <th className="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase tracking-wider">Version</th>
+                          <th className="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase tracking-wider">Date</th>
+                          <th className="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase tracking-wider">Accuracy</th>
+                          <th className="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase tracking-wider">Samples</th>
+                          <th className="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase tracking-wider">Status</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {trainingHistory.map((trainingRun) => (
+                          <tr key={trainingRun.version} className="border-b border-border-color/50 hover:bg-bg-glass/50 transition-colors">
+                            <td className="py-3 px-4 text-sm text-text-primary font-mono">{trainingRun.version}</td>
+                            <td className="py-3 px-4 text-sm text-text-secondary">{trainingRun.date}</td>
+                            <td className="py-3 px-4 text-sm text-text-primary font-medium">{trainingRun.accuracy}</td>
+                            <td className="py-3 px-4 text-sm text-text-secondary">{trainingRun.samples}</td>
+                            <td className="py-3 px-4">
+                              <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+                                trainingRun.status === 'active'
+                                  ? 'bg-accent-green/10 text-accent-green'
+                                  : 'bg-bg-glass text-text-muted'
+                              }`}>
+                                {trainingRun.status}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </Card>
               </motion.div>
             </>
@@ -212,7 +214,7 @@ export default function AdminModel() {
                   <h3 className="text-lg font-semibold font-display text-text-primary mb-4">
                     Latest Evaluation Snapshot
                   </h3>
-                  <div className="grid grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                     {liveEvaluationItems.map((item) => (
                       <div key={item.label}>
                         <p className="text-xs text-text-muted mb-1">{item.label}</p>
@@ -225,7 +227,7 @@ export default function AdminModel() {
 
               <motion.div variants={fadeUp}>
                 <Card hover={false}>
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
                     <h3 className="text-lg font-semibold font-display text-text-primary">
                       Subject Evaluation Scores
                     </h3>
@@ -234,7 +236,8 @@ export default function AdminModel() {
                     </span>
                   </div>
                   {evaluationSubjects.length > 0 ? (
-                    <table className="w-full">
+                    <div className="overflow-x-auto">
+                      <table className="w-full min-w-[560px]">
                       <thead>
                         <tr className="border-b border-border-color">
                           <th className="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase tracking-wider">Subject</th>
@@ -251,7 +254,8 @@ export default function AdminModel() {
                           </tr>
                         ))}
                       </tbody>
-                    </table>
+                      </table>
+                    </div>
                   ) : (
                     <p className="text-sm text-text-secondary">
                       Evaluation subject scores are not available from the backend yet.

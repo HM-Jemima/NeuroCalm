@@ -61,7 +61,7 @@ export default function PricingPage() {
 
       {/* Hero */}
       <section className="relative z-10 pt-32 pb-16">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div
             variants={container}
             initial="initial"
@@ -77,7 +77,7 @@ export default function PricingPage() {
 
             <motion.h1
               variants={fadeUp}
-              className="text-5xl md:text-[64px] font-display font-bold leading-tight mb-6"
+              className="text-4xl sm:text-5xl md:text-[64px] font-display font-bold leading-tight mb-6"
             >
               Completely{' '}
               <span className="gradient-text">Free</span>{' '}
@@ -98,14 +98,14 @@ export default function PricingPage() {
 
       {/* Pricing Card */}
       <section className="relative z-10 pb-24">
-        <div className="max-w-md mx-auto px-6">
+        <div className="max-w-md mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
           >
-            <Card className="p-8 border-accent-blue/30 relative overflow-hidden">
+            <Card className="p-5 border-accent-blue/30 relative overflow-hidden sm:p-8">
               {/* Glow */}
               <div className="absolute -top-20 -right-20 w-40 h-40 bg-accent-blue/10 rounded-full blur-3xl" />
               <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-accent-purple/10 rounded-full blur-3xl" />
@@ -119,7 +119,7 @@ export default function PricingPage() {
                 <h3 className="text-2xl font-display font-bold text-text-primary mb-1">
                   Free Plan
                 </h3>
-                <div className="flex items-baseline gap-1 mb-6">
+                <div className="flex flex-wrap items-baseline gap-1 mb-6">
                   <span className="text-5xl font-display font-bold text-text-primary">$0</span>
                   <span className="text-text-muted text-sm">/ forever during beta</span>
                 </div>
@@ -151,7 +151,7 @@ export default function PricingPage() {
 
       {/* Why Free */}
       <section className="relative z-10 py-24 bg-bg-secondary/30">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -159,7 +159,7 @@ export default function PricingPage() {
             className="text-center mb-16"
           >
             <Badge className="mb-4">Why Free?</Badge>
-            <h2 className="text-4xl font-display font-bold mb-4">
+            <h2 className="text-3xl sm:text-4xl font-display font-bold mb-4">
               Built for the community
             </h2>
             <p className="text-text-secondary max-w-md mx-auto">
@@ -193,17 +193,17 @@ export default function PricingPage() {
 
       {/* CTA */}
       <section className="relative z-10 py-24">
-        <div className="max-w-3xl mx-auto px-6">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
           >
-            <Card className="text-center p-12 border-accent-blue/20">
+            <Card className="text-center p-6 border-accent-blue/20 sm:p-12">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent-blue to-accent-purple flex items-center justify-center mx-auto mb-6">
                 <Brain size={28} className="text-white" />
               </div>
-              <h2 className="text-3xl font-display font-bold mb-4">
+              <h2 className="text-2xl sm:text-3xl font-display font-bold mb-4">
                 Start analyzing for free today
               </h2>
               <p className="text-text-secondary mb-8 max-w-md mx-auto">

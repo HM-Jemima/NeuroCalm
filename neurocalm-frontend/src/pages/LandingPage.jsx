@@ -52,7 +52,7 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="relative z-10 min-h-screen flex items-center pt-16">
-        <div className="max-w-7xl mx-auto px-6 w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full">
           <motion.div
             variants={container}
             initial="initial"
@@ -68,7 +68,7 @@ export default function LandingPage() {
 
             <motion.h1
               variants={fadeUp}
-              className="text-5xl md:text-[64px] font-display font-bold leading-tight mb-6"
+              className="text-4xl sm:text-5xl md:text-[64px] font-display font-bold leading-tight mb-6"
             >
               Detect Stress with{' '}
               <span className="gradient-text">Brain Science</span>
@@ -79,7 +79,7 @@ export default function LandingPage() {
               Understand your brain patterns with clinical-grade accuracy.
             </motion.p>
 
-            <motion.div variants={fadeUp} className="flex gap-4 mb-10">
+            <motion.div variants={fadeUp} className="flex flex-col gap-3 mb-10 sm:flex-row sm:gap-4">
               <Button onClick={() => navigate('/signup')}>
                 Try Free Analysis
                 <ArrowRight size={16} className="ml-2 inline" />
@@ -90,7 +90,7 @@ export default function LandingPage() {
               </Button>
             </motion.div>
 
-            <motion.div variants={fadeUp} className="flex gap-8">
+            <motion.div variants={fadeUp} className="grid grid-cols-3 gap-4 sm:flex sm:gap-8">
               {stats.map((stat) => (
                 <div key={stat.label}>
                   <p className="text-2xl font-display font-bold text-text-primary">{stat.value}</p>
@@ -104,7 +104,7 @@ export default function LandingPage() {
 
       {/* Features Section */}
       <section id="features" className="relative z-10 py-24">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -112,7 +112,7 @@ export default function LandingPage() {
             className="text-center mb-16"
           >
             <Badge className="mb-4">Features</Badge>
-            <h2 className="text-4xl font-display font-bold mb-4">
+            <h2 className="text-3xl sm:text-4xl font-display font-bold mb-4">
               Everything you need for EEG analysis
             </h2>
             <p className="text-text-secondary max-w-md mx-auto">
@@ -146,7 +146,7 @@ export default function LandingPage() {
 
       {/* How It Works */}
       <section id="how-it-works" className="relative z-10 py-24 bg-bg-secondary/30">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -154,7 +154,7 @@ export default function LandingPage() {
             className="text-center mb-16"
           >
             <Badge className="mb-4">How It Works</Badge>
-            <h2 className="text-4xl font-display font-bold mb-4">
+            <h2 className="text-3xl sm:text-4xl font-display font-bold mb-4">
               Simple 4-step process
             </h2>
             <p className="text-text-secondary max-w-md mx-auto">
@@ -191,17 +191,17 @@ export default function LandingPage() {
 
       {/* CTA Section */}
       <section className="relative z-10 py-24">
-        <div className="max-w-3xl mx-auto px-6">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
           >
-            <Card className="text-center p-12 border-accent-blue/20">
+            <Card className="text-center p-6 border-accent-blue/20 sm:p-12">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent-blue to-accent-purple flex items-center justify-center mx-auto mb-6">
                 <Brain size={28} className="text-white" />
               </div>
-              <h2 className="text-3xl font-display font-bold mb-4">
+              <h2 className="text-2xl sm:text-3xl font-display font-bold mb-4">
                 Ready to understand your stress?
               </h2>
               <p className="text-text-secondary mb-8 max-w-md mx-auto">

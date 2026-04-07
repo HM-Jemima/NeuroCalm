@@ -73,9 +73,9 @@ export default function AdminSettings() {
     <div className="min-h-screen bg-bg-primary">
       <AdminSidebar />
 
-      <main className={`p-8 transition-all duration-300 ${isSidebarCollapsed ? 'ml-[92px]' : 'ml-[260px]'}`}>
+      <main className={`px-4 py-6 pb-28 sm:px-6 md:p-8 md:pb-8 transition-all duration-300 ${isSidebarCollapsed ? 'md:ml-[92px]' : 'md:ml-[260px]'}`}>
         <motion.div variants={container} initial="initial" animate="animate" className="space-y-6">
-          <motion.div variants={fadeUp} className="flex items-center justify-between">
+          <motion.div variants={fadeUp} className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-2xl font-display font-bold text-text-primary">Settings</h1>
               <p className="text-sm text-text-secondary mt-1">
@@ -106,7 +106,7 @@ export default function AdminSettings() {
                 </div>
                 <h3 className="text-lg font-semibold font-display text-text-primary">General</h3>
               </div>
-              <div className="grid grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                 <div>
                   <label className="block text-sm text-text-secondary mb-2">Storage Backend</label>
                   <input
@@ -141,7 +141,7 @@ export default function AdminSettings() {
                   { key: 'allow_registration', label: 'Allow Registration', desc: 'Permit new users to create accounts' },
                   { key: 'maintenance_mode', label: 'Maintenance Mode', desc: 'Restrict the app for admin-only maintenance work' },
                 ].map((item) => (
-                  <div key={item.key} className="flex items-center justify-between py-3 border-b border-border-color/50 last:border-0">
+                  <div key={item.key} className="flex items-center justify-between gap-4 py-3 border-b border-border-color/50 last:border-0">
                     <div>
                       <p className="text-sm font-medium text-text-primary">{item.label}</p>
                       <p className="text-xs text-text-muted mt-0.5">{item.desc}</p>
@@ -164,7 +164,7 @@ export default function AdminSettings() {
                 </div>
                 <h3 className="text-lg font-semibold font-display text-text-primary">Rate Limits & Retention</h3>
               </div>
-              <div className="grid grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                 <div>
                   <label className="block text-sm text-text-secondary mb-2">Rate Limit Per Minute</label>
                   <input

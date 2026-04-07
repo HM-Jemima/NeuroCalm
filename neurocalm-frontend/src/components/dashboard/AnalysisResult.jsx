@@ -72,13 +72,13 @@ export default function AnalysisResult({ result }) {
       </span>
 
       {/* Bottom stats */}
-      <div className="grid grid-cols-3 gap-6 w-full">
+      <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-6">
         {[
           { value: `${confidence}%`, label: 'Confidence' },
           { value: `${stressProb}%`, label: 'Stress Prob' },
           { value: features.toLocaleString(), label: 'Features' },
         ].map((stat) => (
-          <div key={stat.label} className="text-center">
+          <div key={stat.label} className="rounded-xl border border-border-color/60 bg-bg-glass/40 px-3 py-2 text-center sm:border-0 sm:bg-transparent sm:p-0">
             <p className="text-lg font-display font-bold text-text-primary">{stat.value}</p>
             <p className="text-xs text-text-muted mt-0.5">{stat.label}</p>
           </div>

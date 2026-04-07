@@ -164,7 +164,7 @@ export default function UploadZone({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="border border-border-color rounded-2xl p-8"
+            className="border border-border-color rounded-2xl p-5 sm:p-8"
           >
             <div className="flex flex-col items-center mb-6">
               <motion.div
@@ -284,7 +284,7 @@ export default function UploadZone({
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
             className={`
-              border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all duration-300
+              border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all duration-300 sm:p-12
               ${isDragOver
                 ? 'border-accent-green bg-accent-green/10'
                 : 'border-border-color hover:border-accent-blue hover:bg-accent-blue/5'
@@ -292,7 +292,7 @@ export default function UploadZone({
             `}
           >
             <div className="flex flex-col items-center gap-4">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-accent-blue to-accent-purple flex items-center justify-center">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent-blue to-accent-purple flex items-center justify-center sm:w-20 sm:h-20">
                 <Upload size={32} className="text-white" />
               </div>
               <div>
@@ -337,9 +337,9 @@ export default function UploadZone({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="border border-border-color rounded-2xl p-6"
+            className="border border-border-color rounded-2xl p-5 sm:p-6"
           >
-            <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-start gap-4 mb-4 sm:items-center">
               <div className="w-12 h-12 bg-accent-blue/10 rounded-xl flex items-center justify-center">
                 <FileText size={24} className="text-accent-blue" />
               </div>

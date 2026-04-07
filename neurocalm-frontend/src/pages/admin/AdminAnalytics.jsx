@@ -22,7 +22,7 @@ export default function AdminAnalytics() {
     <div className="min-h-screen bg-bg-primary">
       <AdminSidebar />
 
-      <main className={`p-8 transition-all duration-300 ${isSidebarCollapsed ? 'ml-[92px]' : 'ml-[260px]'}`}>
+      <main className={`px-4 py-6 pb-28 sm:px-6 md:p-8 md:pb-8 transition-all duration-300 ${isSidebarCollapsed ? 'md:ml-[92px]' : 'md:ml-[260px]'}`}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -39,7 +39,7 @@ export default function AdminAnalytics() {
             <p className="text-sm text-accent-red">{error}</p>
           )}
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <Card hover={false}>
               <p className="text-xs text-text-muted mb-1">This Week</p>
               <p className="text-2xl font-display font-bold text-text-primary">{analytics?.total_this_week ?? 0}</p>
@@ -58,7 +58,7 @@ export default function AdminAnalytics() {
             <h3 className="text-lg font-semibold font-display text-text-primary mb-6">
               Weekly Analysis Volume
             </h3>
-            <div className="h-80">
+            <div className="h-72 sm:h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={analytics?.daily || []}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
@@ -84,7 +84,7 @@ export default function AdminAnalytics() {
             </h3>
             <div className="space-y-3">
               {distribution.map((item) => (
-                <div key={item.range} className="flex items-center gap-4">
+                <div key={item.range} className="flex items-center gap-3 sm:gap-4">
                   <span className="w-20 text-sm text-text-secondary">{item.range}</span>
                   <div className="flex-1 h-2 bg-bg-glass rounded-full overflow-hidden">
                     <div

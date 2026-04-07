@@ -94,7 +94,7 @@ export default function ContactPage() {
 
       {/* Hero */}
       <section className="relative z-10 pt-32 pb-16">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div
             variants={container}
             initial="initial"
@@ -110,7 +110,7 @@ export default function ContactPage() {
 
             <motion.h1
               variants={fadeUp}
-              className="text-5xl md:text-[64px] font-display font-bold leading-tight mb-6"
+              className="text-4xl sm:text-5xl md:text-[64px] font-display font-bold leading-tight mb-6"
             >
               Get in{' '}
               <span className="gradient-text">Touch</span>
@@ -125,7 +125,7 @@ export default function ContactPage() {
 
       {/* Contact Info Cards */}
       <section className="relative z-10 pb-24">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div
             variants={container}
             initial="initial"
@@ -153,7 +153,7 @@ export default function ContactPage() {
 
       {/* Contact Form + Social */}
       <section className="relative z-10 py-24 bg-bg-secondary/30">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-5 gap-10">
             {/* Form */}
             <motion.div
@@ -163,7 +163,7 @@ export default function ContactPage() {
               transition={{ duration: 0.6 }}
               className="lg:col-span-3"
             >
-              <Card className="p-8">
+              <Card className="p-5 sm:p-8">
                 {submitted ? (
                   <div className="text-center py-12">
                     <div className="w-16 h-16 rounded-2xl bg-accent-green/10 flex items-center justify-center mx-auto mb-6">
@@ -185,7 +185,7 @@ export default function ContactPage() {
                       Send us a message
                     </h3>
                     <form onSubmit={handleSubmit} className="space-y-5">
-                      <div className="grid md:grid-cols-2 gap-5">
+                      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                         <div>
                           <label className="block text-sm text-text-secondary mb-2">Name</label>
                           <input
@@ -290,7 +290,7 @@ export default function ContactPage() {
 
       {/* FAQ */}
       <section className="relative z-10 py-24">
-        <div className="max-w-3xl mx-auto px-6">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -298,7 +298,7 @@ export default function ContactPage() {
             className="text-center mb-16"
           >
             <Badge className="mb-4">FAQ</Badge>
-            <h2 className="text-4xl font-display font-bold mb-4">
+            <h2 className="text-3xl sm:text-4xl font-display font-bold mb-4">
               Frequently asked questions
             </h2>
             <p className="text-text-secondary max-w-md mx-auto">

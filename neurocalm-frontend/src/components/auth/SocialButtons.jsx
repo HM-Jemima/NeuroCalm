@@ -52,13 +52,13 @@ export default function SocialButtons() {
   };
 
   return (
-    <div className="flex gap-3">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
       {socials.map((social) => (
         <button
           key={social.name}
           type="button"
           onClick={() => handleSocialClick(social.name)}
-          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl
+          className="flex items-center justify-center gap-2 py-3 rounded-xl
             bg-bg-glass border border-border-color text-text-secondary text-sm font-medium
             hover:border-accent-blue/30 hover:bg-accent-blue/5 transition-all duration-200"
         >

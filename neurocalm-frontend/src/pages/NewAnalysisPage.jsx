@@ -35,7 +35,7 @@ export default function NewAnalysisPage() {
     <div className="min-h-screen bg-bg-primary">
       <Sidebar />
 
-      <main className={`p-8 transition-all duration-300 ${isSidebarCollapsed ? 'ml-[92px]' : 'ml-[260px]'}`}>
+      <main className={`px-4 py-6 pb-28 sm:px-6 md:p-8 md:pb-8 transition-all duration-300 ${isSidebarCollapsed ? 'md:ml-[92px]' : 'md:ml-[260px]'}`}>
         <motion.div
           initial="initial"
           animate="animate"
@@ -53,9 +53,9 @@ export default function NewAnalysisPage() {
             </p>
           </motion.div>
 
-          <motion.div variants={fadeUp} className="grid grid-cols-[1fr_380px] gap-6">
+          <motion.div variants={fadeUp} className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_380px]">
             <Card hover={false}>
-              <div className="flex items-center justify-between mb-5">
+              <div className="flex flex-col gap-3 mb-5 sm:flex-row sm:items-center sm:justify-between">
                 <h3 className="text-lg font-semibold font-display text-text-primary">
                   Upload Analysis File
                 </h3>
@@ -102,7 +102,7 @@ export default function NewAnalysisPage() {
               <h2 className="text-xl font-display font-bold text-text-primary">
                 Analysis Results
               </h2>
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
                 <Card hover={false}>
                   <h3 className="text-lg font-semibold font-display text-text-primary mb-6">
                     Stress Detection

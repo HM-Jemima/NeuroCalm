@@ -39,13 +39,13 @@ export default function Navbar() {
       animate={{ y: 0, opacity: 1 }}
       className="fixed top-0 left-0 right-0 z-50 backdrop-blur-[20px] bg-bg-primary/80 border-b border-border-color"
     >
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-blue to-accent-purple flex items-center justify-center">
             <Brain size={22} className="text-white" />
           </div>
-          <span className="font-display text-[22px] font-bold text-text-primary">
+          <span className="hidden font-display text-[22px] font-bold text-text-primary sm:inline">
             NeuroCalm
           </span>
         </Link>
@@ -75,7 +75,7 @@ export default function Navbar() {
         </div>
 
         {/* Auth Buttons */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           {isAuthenticated ? (
             <Button onClick={() => navigate('/dashboard')} size="sm">
               Dashboard

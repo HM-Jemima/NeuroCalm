@@ -39,7 +39,7 @@ export default function UsersTable({ users = [], onDelete }) {
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full">
+      <table className="w-full min-w-[760px]">
         <thead>
           <tr className="border-b border-border-color">
             {['User', 'Role', 'Analyses', 'Status', 'Joined', 'Actions'].map((col) => (
