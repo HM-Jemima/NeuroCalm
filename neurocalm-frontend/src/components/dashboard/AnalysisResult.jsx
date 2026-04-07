@@ -86,9 +86,9 @@ export default function AnalysisResult({ result }) {
       </div>
 
       {classProbabilities.length > 0 && (
-        <div className="w-full rounded-2xl border border-border-color bg-bg-glass/60 p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">
+        <div className="w-full rounded-2xl border border-border-color bg-bg-secondary/95 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+          <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
               Model class probabilities
             </p>
             <span className="text-[11px] text-text-muted">4-class output</span>
@@ -101,15 +101,21 @@ export default function AnalysisResult({ result }) {
 
               return (
                 <div key={classLevel.label} className="space-y-1.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className={`font-medium ${isPredicted ? classLevel.textClass : 'text-text-secondary'}`}>
-                      {classLevel.label}
+                  <div className="flex items-center justify-between gap-3 text-xs">
+                    <span className="flex min-w-0 items-center gap-2 font-medium text-text-primary">
+                      <span className={`h-2 w-2 shrink-0 rounded-full ${classLevel.ringClass}`} />
+                      <span className="truncate">{classLevel.label}</span>
+                      {isPredicted && (
+                        <span className={`${classLevel.bgClass} ${classLevel.textClass} rounded-full px-2 py-0.5 text-[10px] font-semibold`}>
+                          Predicted
+                        </span>
+                      )}
                     </span>
-                    <span className={isPredicted ? classLevel.textClass : 'text-text-muted'}>
+                    <span className={`shrink-0 font-semibold ${isPredicted ? classLevel.textClass : 'text-text-secondary'}`}>
                       {percent.toFixed(1)}%
                     </span>
                   </div>
-                  <div className="h-2 rounded-full bg-bg-primary/70">
+                  <div className="h-2 overflow-hidden rounded-full bg-bg-primary">
                     <div
                       className={`h-full rounded-full ${classLevel.ringClass}`}
                       style={{ width: `${Math.max(2, Math.min(percent, 100))}%` }}
