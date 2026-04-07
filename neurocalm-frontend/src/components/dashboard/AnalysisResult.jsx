@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { getStressLevel } from '../../utils/helpers';
+import { STRESS_LEVEL_LIST } from '../../utils/constants';
 
 export default function AnalysisResult({ result }) {
   if (!result) return null;
@@ -8,7 +9,10 @@ export default function AnalysisResult({ result }) {
   const confidence = result.confidence ?? 87;
   const stressProb = result.stress_probability ?? (100 - confidence);
   const features = result.features_count ?? 1222;
-  const level = getStressLevel(score);
+  const level = getStressLevel(score, result.workload_class);
+  const classProbabilities = Array.isArray(result.class_probabilities)
+    ? result.class_probabilities
+    : [];
 
   // SVG circle math
   const radius = 80;
@@ -80,6 +84,43 @@ export default function AnalysisResult({ result }) {
           </div>
         ))}
       </div>
+
+      {classProbabilities.length > 0 && (
+        <div className="w-full rounded-2xl border border-border-color bg-bg-glass/60 p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">
+              Model class probabilities
+            </p>
+            <span className="text-[11px] text-text-muted">4-class output</span>
+          </div>
+          <div className="space-y-3">
+            {STRESS_LEVEL_LIST.map((classLevel, index) => {
+              const probability = Number(classProbabilities[index] ?? 0);
+              const percent = probability <= 1 ? probability * 100 : probability;
+              const isPredicted = classLevel.classId === Number(result.workload_class);
+
+              return (
+                <div key={classLevel.label} className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className={`font-medium ${isPredicted ? classLevel.textClass : 'text-text-secondary'}`}>
+                      {classLevel.label}
+                    </span>
+                    <span className={isPredicted ? classLevel.textClass : 'text-text-muted'}>
+                      {percent.toFixed(1)}%
+                    </span>
+                  </div>
+                  <div className="h-2 rounded-full bg-bg-primary/70">
+                    <div
+                      className={`h-full rounded-full ${classLevel.ringClass}`}
+                      style={{ width: `${Math.max(2, Math.min(percent, 100))}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

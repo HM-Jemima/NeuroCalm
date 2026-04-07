@@ -12,7 +12,7 @@ import HistoryTable from '../components/dashboard/HistoryTable';
 import useAuthStore from '../store/authStore';
 import useSidebarStore from '../store/sidebarStore';
 import { useAnalysis } from '../hooks/useAnalysis';
-import { formatDate } from '../utils/helpers';
+import { formatDate, getStressLevelValue } from '../utils/helpers';
 import { getAnalysisBandPowers } from '../utils/analysisPresentation';
 
 function average(values) {
@@ -60,18 +60,17 @@ function buildQuickStats(items) {
 
 function buildBreakdownStats(items) {
   const total = items.length;
-  const relaxed = items.filter((item) => (item.stress_score ?? item.score ?? 0) <= 40).length;
-  const moderate = items.filter((item) => {
-    const score = item.stress_score ?? item.score ?? 0;
-    return score > 40 && score <= 60;
-  }).length;
-  const stressed = items.filter((item) => (item.stress_score ?? item.score ?? 0) > 60).length;
+  const veryRelaxed = items.filter((item) => getStressLevelValue(item) === 'very-relaxed').length;
+  const relaxed = items.filter((item) => getStressLevelValue(item) === 'relaxed').length;
+  const moderate = items.filter((item) => getStressLevelValue(item) === 'moderate').length;
+  const stressed = items.filter((item) => getStressLevelValue(item) === 'stressed').length;
   const avgConfidence = average(items.map((item) => item.confidence ?? 0));
 
   return [
-    { label: 'Relaxed Results', displayValue: String(relaxed), width: total ? (relaxed / total) * 100 : 0, color: 'bg-accent-green' },
-    { label: 'Stressed Results', displayValue: String(stressed), width: total ? (stressed / total) * 100 : 0, color: 'bg-accent-red' },
+    { label: 'Very Relaxed Results', displayValue: String(veryRelaxed), width: total ? (veryRelaxed / total) * 100 : 0, color: 'bg-emerald-400' },
+    { label: 'Relaxed Results', displayValue: String(relaxed), width: total ? (relaxed / total) * 100 : 0, color: 'bg-cyan-400' },
     { label: 'Moderate Results', displayValue: String(moderate), width: total ? (moderate / total) * 100 : 0, color: 'bg-accent-yellow' },
+    { label: 'Stressed Results', displayValue: String(stressed), width: total ? (stressed / total) * 100 : 0, color: 'bg-accent-red' },
     { label: 'Avg Confidence', displayValue: `${avgConfidence}%`, width: avgConfidence, color: 'bg-accent-blue' },
   ];
 }

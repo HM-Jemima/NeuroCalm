@@ -32,6 +32,8 @@ async def get_analysis_history(
                     workload_class=a.workload_class,
                     features_count=a.features_count,
                 ),
+                workload_class=a.workload_class,
+                class_probabilities=a.class_probabilities or [],
                 created_at=a.created_at,
                 user_name=a.user.full_name,
                 user_email=a.user.email,

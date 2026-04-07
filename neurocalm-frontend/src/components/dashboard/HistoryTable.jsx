@@ -1,11 +1,15 @@
-import { Eye, Download, Trash2, FileText, CheckCircle, AlertCircle } from 'lucide-react';
+import { Eye, Download, Trash2, FileText, CheckCircle, AlertCircle, Brain } from 'lucide-react';
 import Avatar from '../common/Avatar';
 import { formatDate } from '../../utils/helpers';
 import { getStressLevel } from '../../utils/helpers';
 
 const LEVEL_STYLES = {
+  'Very Relaxed': {
+    className: 'bg-emerald-400/10 text-emerald-300',
+    Icon: CheckCircle,
+  },
   Relaxed: {
-    className: 'bg-accent-green/10 text-accent-green',
+    className: 'bg-cyan-400/10 text-cyan-300',
     Icon: CheckCircle,
   },
   Moderate: {
@@ -14,7 +18,7 @@ const LEVEL_STYLES = {
   },
   Stressed: {
     className: 'bg-accent-red/10 text-accent-red',
-    Icon: AlertCircle,
+    Icon: Brain,
   },
 };
 
@@ -51,7 +55,7 @@ export default function HistoryTable({
         </thead>
         <tbody>
           {items.map((item) => {
-            const stressLevel = getStressLevel(item.stress_score ?? item.score ?? 0);
+            const stressLevel = getStressLevel(item.stress_score ?? item.score ?? 0, item.workload_class);
             const levelStyle = LEVEL_STYLES[stressLevel.label] || LEVEL_STYLES.Stressed;
             const LevelIcon = levelStyle.Icon;
             return (

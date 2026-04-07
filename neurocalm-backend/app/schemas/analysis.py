@@ -33,6 +33,8 @@ class AnalysisHistoryItem(BaseModel):
     filename: str
     stress_score: float
     confidence: float
+    workload_class: int
+    class_probabilities: list[float]
     created_at: datetime
     user_name: str
     user_email: str

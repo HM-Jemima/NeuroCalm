@@ -350,12 +350,14 @@ async def get_all_analyses(
     result = await db.execute(query)
     rows = result.scalars().all()
 
-    def stress_label(score):
-        if score <= 40:
-            return "Relaxed"
-        if score <= 60:
-            return "Moderate"
-        return "Stressed"
+    def workload_label(workload_class):
+        labels = ["Very Relaxed", "Relaxed", "Moderate", "Stressed"]
+        if workload_class is None:
+            return "Unknown"
+        try:
+            return labels[int(workload_class)]
+        except (ValueError, IndexError):
+            return "Unknown"
 
     items = []
     for a in rows:
@@ -363,7 +365,7 @@ async def get_all_analyses(
             "id": a.id,
             "user": a.user.full_name,
             "file": a.filename,
-            "result": stress_label(a.stress_score),
+            "result": workload_label(a.workload_class),
             "confidence": f"{get_display_confidence(a.confidence, stress_score=a.stress_score, workload_class=a.workload_class, features_count=a.features_count)}%",
             "date": a.created_at.strftime("%Y-%m-%d"),
             "status": "completed",

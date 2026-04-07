@@ -14,11 +14,12 @@ import BandPowerChart from '../components/dashboard/BandPowerChart';
 import { useAnalysis } from '../hooks/useAnalysis';
 import useAuthStore from '../store/authStore';
 import useSidebarStore from '../store/sidebarStore';
-import { formatDate, getStressLevel } from '../utils/helpers';
+import { formatDate, getStressLevel, getStressLevelOptions, getStressLevelValue } from '../utils/helpers';
 import { getAnalysisBandPowers } from '../utils/analysisPresentation';
 
 const levelConfig = {
-  Relaxed: { color: 'bg-accent-green/10 text-accent-green', icon: CheckCircle },
+  'Very Relaxed': { color: 'bg-emerald-400/10 text-emerald-300', icon: CheckCircle },
+  Relaxed: { color: 'bg-cyan-400/10 text-cyan-300', icon: CheckCircle },
   Moderate: { color: 'bg-accent-yellow/10 text-accent-yellow', icon: AlertCircle },
   Stressed: { color: 'bg-accent-red/10 text-accent-red', icon: Brain },
 };
@@ -33,13 +34,13 @@ function average(values) {
 function buildSummaryStats(history) {
   const avgScore = average(history.map((item) => item.stress_score ?? item.score ?? 0));
   const avgConfidence = average(history.map((item) => item.confidence ?? 0));
-  const relaxedCount = history.filter((item) => (item.stress_score ?? item.score ?? 0) <= 40).length;
+  const lowStateCount = history.filter((item) => ['very-relaxed', 'relaxed'].includes(getStressLevelValue(item))).length;
 
   return [
     { label: 'Total Reports', value: String(history.length), icon: FileText, color: 'bg-accent-blue/10 text-accent-blue' },
     { label: 'Avg Stress Score', value: String(avgScore), icon: Brain, color: 'bg-accent-green/10 text-accent-green' },
     { label: 'Avg Confidence', value: `${avgConfidence}%`, icon: BarChart3, color: 'bg-accent-purple/10 text-accent-purple' },
-    { label: 'Relaxed Results', value: `${history.length ? Math.round((relaxedCount / history.length) * 100) : 0}%`, icon: TrendingDown, color: 'bg-accent-cyan/10 text-accent-cyan' },
+    { label: 'Calm Results', value: `${history.length ? Math.round((lowStateCount / history.length) * 100) : 0}%`, icon: TrendingDown, color: 'bg-accent-cyan/10 text-accent-cyan' },
   ];
 }
 
@@ -71,7 +72,7 @@ export default function ReportsPage() {
       return true;
     }
 
-    const level = getStressLevel(item.stress_score ?? item.score ?? 0).label.toLowerCase();
+    const level = getStressLevelValue(item);
     return level === filter;
   });
 
@@ -128,9 +129,10 @@ export default function ReportsPage() {
           <motion.div variants={fadeUp} className="flex gap-2">
             {[
               { id: 'all', label: 'All Reports' },
-              { id: 'relaxed', label: 'Relaxed' },
-              { id: 'moderate', label: 'Moderate' },
-              { id: 'stressed', label: 'Stressed' },
+              ...getStressLevelOptions().map((level) => ({
+                id: level.label.toLowerCase().replace(/\s+/g, '-'),
+                label: level.label,
+              })),
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -160,8 +162,8 @@ export default function ReportsPage() {
 
             {filteredReports.map((report) => {
               const score = report.stress_score ?? report.score ?? 0;
-              const level = getStressLevel(score);
-              const config = levelConfig[level.label];
+              const level = getStressLevel(score, report.workload_class);
+              const config = levelConfig[level.label] || levelConfig.Stressed;
               const LevelIcon = config.icon;
 
               return (
@@ -174,7 +176,7 @@ export default function ReportsPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-1">
                         <h3 className="text-base font-semibold text-text-primary">{report.filename || report.file_name}</h3>
-                        <Badge variant={level.label === 'Relaxed' ? 'success' : 'default'} className="text-[10px] py-0.5">
+                        <Badge variant={['Very Relaxed', 'Relaxed'].includes(level.label) ? 'success' : 'default'} className="text-[10px] py-0.5">
                           {level.label}
                         </Badge>
                       </div>
@@ -188,7 +190,7 @@ export default function ReportsPage() {
                           {formatDate(report.created_at || report.date)}
                         </span>
                         <span>{report.user_name || 'Unknown user'}</span>
-                        <span className={`flex items-center gap-1 font-semibold ${level.label === 'Relaxed' ? 'text-accent-green' : level.label === 'Moderate' ? 'text-accent-yellow' : 'text-accent-red'}`}>
+                        <span className={`flex items-center gap-1 font-semibold ${level.textClass}`}>
                           <Brain size={12} />
                           Score: {score}
                         </span>
@@ -234,8 +236,8 @@ export default function ReportsPage() {
       >
         {viewReport && (() => {
           const score = viewReport.stress_score ?? viewReport.score ?? 0;
-          const level = getStressLevel(score);
-          const config = levelConfig[level.label];
+          const level = getStressLevel(score, viewReport.workload_class);
+          const config = levelConfig[level.label] || levelConfig.Stressed;
           const LevelIcon = config.icon;
 
           return (
@@ -247,7 +249,7 @@ export default function ReportsPage() {
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-1">
                     <h3 className="text-lg font-semibold font-display text-text-primary">{viewReport.filename || viewReport.file_name}</h3>
-                    <Badge variant={level.label === 'Relaxed' ? 'success' : 'default'} className="text-[10px] py-0.5">
+                    <Badge variant={['Very Relaxed', 'Relaxed'].includes(level.label) ? 'success' : 'default'} className="text-[10px] py-0.5">
                       {level.label}
                     </Badge>
                   </div>
