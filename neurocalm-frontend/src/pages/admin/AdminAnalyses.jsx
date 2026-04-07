@@ -11,10 +11,17 @@ import useSidebarStore from '../../store/sidebarStore';
 import { useAdmin } from '../../hooks/useAdmin';
 
 const resultColors = {
-  Stressed: 'text-accent-red bg-accent-red/10',
-  Relaxed: 'text-accent-green bg-accent-green/10',
+  'Very Relaxed': 'text-emerald-300 bg-emerald-400/10',
+  Relaxed: 'text-cyan-300 bg-cyan-400/10',
   Moderate: 'text-accent-yellow bg-accent-yellow/10',
+  Stressed: 'text-accent-red bg-accent-red/10',
 };
+
+const resultFilters = ['all', 'very-relaxed', 'relaxed', 'moderate', 'stressed'];
+
+function resultToFilterValue(result = '') {
+  return result.toLowerCase().replace(/\s+/g, '-');
+}
 
 export default function AdminAnalyses() {
   const { user } = useAuthStore();
@@ -31,7 +38,7 @@ export default function AdminAnalyses() {
     const matchesSearch = analysis.user.toLowerCase().includes(search.toLowerCase())
       || analysis.file.toLowerCase().includes(search.toLowerCase())
       || analysis.id.toLowerCase().includes(search.toLowerCase());
-    const matchesFilter = filter === 'all' || analysis.result.toLowerCase() === filter;
+    const matchesFilter = filter === 'all' || resultToFilterValue(analysis.result) === filter;
     return matchesSearch && matchesFilter;
   });
 
@@ -69,7 +76,7 @@ export default function AdminAnalyses() {
               />
             </div>
             <div className="flex gap-2">
-              {['all', 'stressed', 'relaxed', 'moderate'].map((value) => (
+              {resultFilters.map((value) => (
                 <button
                   key={value}
                   onClick={() => setFilter(value)}
@@ -79,7 +86,7 @@ export default function AdminAnalyses() {
                       : 'text-text-muted hover:text-text-secondary'
                     }`}
                 >
-                  {value}
+                  {value === 'all' ? 'all' : value.replace('-', ' ')}
                 </button>
               ))}
             </div>

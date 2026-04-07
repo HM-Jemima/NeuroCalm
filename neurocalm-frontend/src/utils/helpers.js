@@ -1,4 +1,4 @@
-import { VALID_FILE_EXTENSIONS, STRESS_LEVELS } from './constants';
+import { VALID_FILE_EXTENSIONS, STRESS_LEVELS, STRESS_LEVEL_LIST } from './constants';
 
 export function isValidFile(file) {
   const extension = '.' + file.name.split('.').pop().toLowerCase();
@@ -13,10 +13,25 @@ export function formatFileSize(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 }
 
-export function getStressLevel(score) {
+export function getStressLevel(score, workloadClass = null) {
+  const parsedClass = Number(workloadClass);
+  if (Number.isInteger(parsedClass) && parsedClass >= 0 && parsedClass < STRESS_LEVEL_LIST.length) {
+    return STRESS_LEVEL_LIST[parsedClass];
+  }
+
+  if (score <= STRESS_LEVELS.VERY_RELAXED.max) return STRESS_LEVELS.VERY_RELAXED;
   if (score <= STRESS_LEVELS.RELAXED.max) return STRESS_LEVELS.RELAXED;
   if (score <= STRESS_LEVELS.MODERATE.max) return STRESS_LEVELS.MODERATE;
   return STRESS_LEVELS.STRESSED;
+}
+
+export function getStressLevelOptions() {
+  return STRESS_LEVEL_LIST;
+}
+
+export function getStressLevelValue(item) {
+  const level = getStressLevel(item?.stress_score ?? item?.score ?? 0, item?.workload_class);
+  return level.label.toLowerCase().replace(/\s+/g, '-');
 }
 
 export function formatDate(dateStr) {

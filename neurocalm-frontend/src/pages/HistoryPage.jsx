@@ -10,14 +10,15 @@ import BandPowerChart from '../components/dashboard/BandPowerChart';
 import { useAnalysis } from '../hooks/useAnalysis';
 import useAuthStore from '../store/authStore';
 import useSidebarStore from '../store/sidebarStore';
-import { formatDate, getStressLevel } from '../utils/helpers';
+import { formatDate, getStressLevelValue, getStressLevelOptions } from '../utils/helpers';
 import { getAnalysisBandPowers } from '../utils/analysisPresentation';
 
 const RESULT_FILTERS = [
   { value: 'all', label: 'All Results' },
-  { value: 'relaxed', label: 'Relaxed' },
-  { value: 'moderate', label: 'Moderate' },
-  { value: 'stressed', label: 'Stressed' },
+  ...getStressLevelOptions().map((level) => ({
+    value: level.label.toLowerCase().replace(/\s+/g, '-'),
+    label: level.label,
+  })),
 ];
 
 const DATE_FILTERS = [
@@ -109,7 +110,7 @@ export default function HistoryPage() {
 
   const filteredHistory = history.filter((item) => {
     const filename = item.filename || item.file_name || '';
-    const stressLevel = getStressLevel(item.stress_score ?? item.score ?? 0).label.toLowerCase();
+    const stressLevel = getStressLevelValue(item);
     const query = search.trim().toLowerCase();
     const searchHaystack = [
       filename,

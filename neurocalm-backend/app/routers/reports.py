@@ -15,6 +15,7 @@ from app.services.analysis_service import get_analysis_by_id
 router = APIRouter(prefix="/reports", tags=["Reports"])
 
 CLASS_LABELS = ["0-back", "1-back", "2-back", "3-back"]
+WORKLOAD_STATE_LABELS = ["Very Relaxed", "Relaxed", "Moderate", "Stressed"]
 
 
 @router.get("/{analysis_id}/json")
@@ -43,10 +44,10 @@ async def download_report_json(
         "features_count": analysis.features_count,
         "band_powers": analysis.band_powers,
         "workload_class": analysis.workload_class,
-        "workload_label": CLASS_LABELS[analysis.workload_class] if analysis.workload_class < len(CLASS_LABELS) else "Unknown",
+        "workload_label": _workload_label(analysis.workload_class),
         "class_probabilities": {
             label: round(p * 100, 1)
-            for label, p in zip(CLASS_LABELS, class_probs)
+            for label, p in zip(WORKLOAD_STATE_LABELS, class_probs)
         },
         "analyzed_by": analysis.user.full_name,
         "created_at": analysis.created_at.isoformat(),
@@ -61,15 +62,21 @@ async def download_report_json(
 
 
 def _stress_label(score):
-    if score <= 40:
+    if score <= 25:
+        return "Very Relaxed"
+    if score <= 50:
         return "Relaxed"
-    if score <= 60:
+    if score <= 75:
         return "Moderate"
     return "Stressed"
 
 
 def _workload_label(cls: int) -> str:
-    return CLASS_LABELS[cls] if cls < len(CLASS_LABELS) else "Unknown"
+    try:
+        class_index = int(cls)
+    except (TypeError, ValueError):
+        return "Unknown"
+    return WORKLOAD_STATE_LABELS[class_index] if class_index < len(WORKLOAD_STATE_LABELS) else "Unknown"
 
 
 def _build_pdf(analysis) -> bytes:
@@ -133,12 +140,12 @@ def _build_pdf(analysis) -> bytes:
     bar_x = 70
     bar_max_w = 100
     colors = [
-        (34, 197, 94),   # green — 0-back (low load)
-        (99, 102, 241),  # indigo — 1-back
-        (251, 191, 36),  # yellow — 2-back
-        (239, 68, 68),   # red — 3-back (high load)
+        (34, 197, 94),
+        (6, 182, 212),
+        (251, 191, 36),
+        (239, 68, 68),
     ]
-    for i, (label, prob) in enumerate(zip(CLASS_LABELS, class_probs)):
+    for i, (label, prob) in enumerate(zip(WORKLOAD_STATE_LABELS, class_probs)):
         y = pdf.get_y()
         pdf.set_font("Helvetica", "", 9)
         pdf.set_text_color(60, 60, 60)
@@ -165,9 +172,11 @@ def _build_pdf(analysis) -> bytes:
 
     label = _stress_label(analysis.stress_score)
 
-    if analysis.stress_score <= 40:
+    if analysis.stress_score <= 25:
         score_r, score_g, score_b = 34, 139, 34
-    elif analysis.stress_score <= 60:
+    elif analysis.stress_score <= 50:
+        score_r, score_g, score_b = 6, 140, 170
+    elif analysis.stress_score <= 75:
         score_r, score_g, score_b = 218, 165, 32
     else:
         score_r, score_g, score_b = 200, 50, 50
@@ -231,25 +240,25 @@ def _build_pdf(analysis) -> bytes:
 
     if analysis.workload_class == 0:
         text = (
-            "The fNIRS analysis indicates LOW cognitive workload (0-back level). "
-            "Hemodynamic patterns suggest a relaxed cognitive state with minimal "
+            "The fNIRS analysis indicates a VERY RELAXED cognitive state. "
+            "Hemodynamic patterns suggest minimal "
             "working memory demand."
         )
     elif analysis.workload_class == 1:
         text = (
-            "The fNIRS analysis indicates LIGHT cognitive workload (1-back level). "
-            "Moderate prefrontal activation detected. The subject is engaged but "
+            "The fNIRS analysis indicates a RELAXED cognitive state. "
+            "Light prefrontal activation detected. The subject is engaged but "
             "not under significant cognitive strain."
         )
     elif analysis.workload_class == 2:
         text = (
-            "The fNIRS analysis indicates MODERATE cognitive workload (2-back level). "
+            "The fNIRS analysis indicates a MODERATE cognitive workload state. "
             "Elevated prefrontal cortex activity suggests sustained working memory "
             "engagement. Consider periodic breaks to manage cognitive fatigue."
         )
     else:
         text = (
-            "The fNIRS analysis indicates HIGH cognitive workload (3-back level). "
+            "The fNIRS analysis indicates a STRESSED cognitive workload state. "
             "Significant hemodynamic response detected in prefrontal regions, "
             "consistent with heavy working memory demand. Stress management "
             "strategies are recommended."

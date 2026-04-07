@@ -29,13 +29,13 @@ const MOCK_MODEL = {
 
 const MOCK_ANALYSES = [
   { id: 'A-1052', user: 'Dr. Sarah Admin', file: 'admin_review_batch_01.mat', result: 'Moderate', confidence: '93.0%', date: '2026-02-23', status: 'completed' },
-  { id: 'A-1051', user: 'John Doe', file: 'eeg_recording_001.mat', result: 'Relaxed', confidence: '92.0%', date: '2026-02-23', status: 'completed' },
+  { id: 'A-1051', user: 'John Doe', file: 'eeg_recording_001.mat', result: 'Very Relaxed', confidence: '92.0%', date: '2026-02-23', status: 'completed' },
   { id: 'A-1050', user: 'Emily Chen', file: 'session_morning.edf', result: 'Stressed', confidence: '87.0%', date: '2026-02-23', status: 'completed' },
   { id: 'A-1049', user: 'Dr. Sarah Admin', file: 'clinical_trial_eeg_005.edf', result: 'Relaxed', confidence: '90.0%', date: '2026-02-22', status: 'completed' },
   { id: 'A-1048', user: 'John Doe', file: 'morning_session_feb22.edf', result: 'Relaxed', confidence: '89.0%', date: '2026-02-22', status: 'completed' },
-  { id: 'A-1047', user: 'Dr. Michael Ross', file: 'post_meditation.mat', result: 'Relaxed', confidence: '95.0%', date: '2026-02-22', status: 'completed' },
+  { id: 'A-1047', user: 'Dr. Michael Ross', file: 'post_meditation.mat', result: 'Very Relaxed', confidence: '95.0%', date: '2026-02-22', status: 'completed' },
   { id: 'A-1046', user: 'John Doe', file: 'baseline_test.csv', result: 'Moderate', confidence: '91.0%', date: '2026-02-21', status: 'completed' },
-  { id: 'A-1045', user: 'Emily Chen', file: 'relaxation_study.mat', result: 'Relaxed', confidence: '94.0%', date: '2026-02-21', status: 'completed' },
+  { id: 'A-1045', user: 'Emily Chen', file: 'relaxation_study.mat', result: 'Very Relaxed', confidence: '94.0%', date: '2026-02-21', status: 'completed' },
   { id: 'A-1044', user: 'Alex Kumar', file: 'work_stress_sample.edf', result: 'Stressed', confidence: '88.0%', date: '2026-02-21', status: 'completed' },
   { id: 'A-1043', user: 'Dr. Sarah Admin', file: 'validation_set_alpha.mat', result: 'Stressed', confidence: '88.0%', date: '2026-02-20', status: 'completed' },
 ];

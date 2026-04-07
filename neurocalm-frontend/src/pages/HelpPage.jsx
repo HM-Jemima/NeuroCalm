@@ -46,7 +46,7 @@ const faq = [
   },
   {
     q: 'What do the stress levels mean?',
-    a: 'Relaxed (score < 40): Low stress indicators. Moderate (40–65): Some stress markers present. Stressed (> 65): Significant stress patterns detected.',
+    a: 'The model output is shown as 4 states: Very Relaxed, Relaxed, Moderate, and Stressed. Older score-only results fall back to similar score ranges from low to high stress.',
   },
   {
     q: 'Can I delete my analysis history?',

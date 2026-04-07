@@ -83,9 +83,25 @@ function normalizeAnalysis(item, fallbackUser) {
     stress_probability: item.stress_probability ?? (score > 50 ? score : 100 - score),
     features_count: item.features_count ?? 1222,
     band_powers: getAnalysisBandPowers(item),
+    workload_class: item.workload_class,
+    class_probabilities: item.class_probabilities,
     user_name: item.user_name || fallbackUser?.full_name || 'User',
     user_email: item.user_email || fallbackUser?.email || '',
     analysis_mode: item.analysis_mode || item.analysisMode || null,
+  };
+}
+
+function buildMockClassOutput(score) {
+  const workloadClass = score <= 25 ? 0 : score <= 50 ? 1 : score <= 75 ? 2 : 3;
+  const probabilities = [0.08, 0.08, 0.08, 0.08];
+  probabilities[workloadClass] = 0.67;
+  const remaining = 1 - probabilities[workloadClass];
+
+  return {
+    workload_class: workloadClass,
+    class_probabilities: probabilities.map((probability, index) => (
+      index === workloadClass ? probability : Number((remaining / 3).toFixed(4))
+    )),
   };
 }
 
@@ -227,6 +243,7 @@ export function useAnalysis() {
         await sleep(300);
 
         const score = Math.floor(Math.random() * 80) + 10;
+        const mockClassOutput = buildMockClassOutput(score);
         const result = normalizeAnalysis({
           id: String(Date.now()),
           filename: file.name,
@@ -244,6 +261,7 @@ export function useAnalysis() {
           created_at: new Date().toISOString(),
           user_name: user?.full_name || 'User',
           user_email: user?.email || '',
+          ...mockClassOutput,
           ...analysisMeta,
         }, user);
 
