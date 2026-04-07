@@ -122,14 +122,14 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-bg-primary">
       <Sidebar />
 
-      <main className={`p-8 transition-all duration-300 ${isSidebarCollapsed ? 'ml-[92px]' : 'ml-[260px]'}`}>
+      <main className={`px-4 py-6 pb-28 sm:px-6 md:p-8 md:pb-8 transition-all duration-300 ${isSidebarCollapsed ? 'md:ml-[92px]' : 'md:ml-[260px]'}`}>
         <motion.div
           variants={container}
           initial="initial"
           animate="animate"
           className="space-y-8"
         >
-          <motion.div variants={fadeUp} className="flex items-center justify-between">
+          <motion.div variants={fadeUp} className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-2xl font-display font-bold text-text-primary">
                 Welcome back, {user?.full_name?.split(' ')[0] || 'User'}
@@ -138,12 +138,12 @@ export default function DashboardPage() {
                 Here&apos;s an overview of your brain analysis activity
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="relative">
+            <div className="flex w-full items-center gap-3 sm:w-auto">
+              <div className="relative flex-1 sm:flex-none">
                 <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
                 <input
                   placeholder="Search..."
-                  className="pl-9 pr-4 py-2 bg-bg-glass border border-border-color rounded-xl text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-blue w-48"
+                  className="w-full pl-9 pr-4 py-2 bg-bg-glass border border-border-color rounded-xl text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-blue sm:w-48"
                 />
               </div>
               <button className="relative w-10 h-10 rounded-xl border border-border-color flex items-center justify-center text-text-muted hover:text-text-primary hover:border-accent-blue/30 transition-all">
@@ -153,13 +153,13 @@ export default function DashboardPage() {
             </div>
           </motion.div>
 
-          <motion.div variants={fadeUp} className="grid grid-cols-4 gap-4">
+          <motion.div variants={fadeUp} className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {quickStats.map((stat) => (
               <StatsCard key={stat.label} {...stat} />
             ))}
           </motion.div>
 
-          <motion.div variants={fadeUp} className="grid grid-cols-[1fr_400px] gap-6">
+          <motion.div variants={fadeUp} className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_400px]">
             <Card hover={false}>
               <h3 className="text-lg font-semibold font-display text-text-primary mb-4">
                 Upload Analysis File
@@ -202,7 +202,7 @@ export default function DashboardPage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="grid grid-cols-2 gap-6"
+              className="grid grid-cols-1 gap-6 xl:grid-cols-2"
             >
               <Card hover={false}>
                 <h3 className="text-lg font-semibold font-display text-text-primary mb-6">
@@ -244,13 +244,13 @@ export default function DashboardPage() {
       >
         {viewItem && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between px-1">
-              <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-4 px-1 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-center gap-3">
                 <div className="w-10 h-10 bg-accent-blue/10 rounded-xl flex items-center justify-center">
                   <FileText size={18} className="text-accent-blue" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-text-primary">
+                  <p className="text-sm font-semibold text-text-primary break-words">
                     {viewItem.filename || viewItem.file_name}
                   </p>
                   <p className="text-xs text-text-muted">
@@ -267,7 +267,7 @@ export default function DashboardPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               <div>
                 <h4 className="text-sm font-medium text-text-muted mb-4 uppercase tracking-wider">
                   Stress Analysis

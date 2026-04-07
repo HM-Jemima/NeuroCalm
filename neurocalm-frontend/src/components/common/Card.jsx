@@ -10,7 +10,7 @@ export default function Card({ children, className = '', hover = true, ...props 
       } : {}}
       className={`
         bg-bg-card backdrop-blur-[20px] border border-border-color
-        rounded-2xl p-6 transition-all duration-300
+        rounded-2xl p-5 transition-all duration-300 sm:p-6
         ${className}
       `}
       {...props}

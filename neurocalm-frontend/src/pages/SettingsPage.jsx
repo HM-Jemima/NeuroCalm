@@ -267,7 +267,7 @@ export default function SettingsPage() {
     <div className="min-h-screen bg-bg-primary">
       <Sidebar />
 
-      <main className={`p-8 transition-all duration-300 ${isSidebarCollapsed ? 'ml-[92px]' : 'ml-[260px]'}`}>
+      <main className={`px-4 py-6 pb-28 sm:px-6 md:p-8 md:pb-8 transition-all duration-300 ${isSidebarCollapsed ? 'md:ml-[92px]' : 'md:ml-[260px]'}`}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -278,7 +278,7 @@ export default function SettingsPage() {
             <p className="text-sm text-text-secondary mt-1">Manage your account preferences</p>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 overflow-x-auto pb-1">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -297,7 +297,7 @@ export default function SettingsPage() {
 
           {activeTab === 'profile' && (
             <Card hover={false} className="max-w-2xl">
-              <div className="flex items-center gap-4 mb-8">
+              <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center">
                 <Avatar name={user?.full_name || 'User'} size={64} className="rounded-2xl" />
                 <div>
                   <h3 className="text-lg font-semibold text-text-primary">
@@ -410,7 +410,7 @@ export default function SettingsPage() {
                     desc: 'Weekly overview of your stress patterns',
                   },
                 ].map((item) => (
-                  <div key={item.key} className="flex items-center justify-between py-3 border-b border-border-color/50 last:border-0">
+                  <div key={item.key} className="flex items-center justify-between gap-4 py-3 border-b border-border-color/50 last:border-0">
                     <div>
                       <p className="text-sm font-medium text-text-primary">{item.label}</p>
                       <p className="text-xs text-text-muted mt-0.5">{item.desc}</p>

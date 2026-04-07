@@ -73,7 +73,7 @@ export default function HelpPage() {
       <Sidebar />
 
       {/* Main Content */}
-      <main className={`p-8 transition-all duration-300 ${isSidebarCollapsed ? 'ml-[92px]' : 'ml-[260px]'}`}>
+      <main className={`px-4 py-6 pb-28 sm:px-6 md:p-8 md:pb-8 transition-all duration-300 ${isSidebarCollapsed ? 'md:ml-[92px]' : 'md:ml-[260px]'}`}>
         <motion.div variants={container} initial="initial" animate="animate" className="space-y-8">
           {/* Header */}
           <motion.div variants={fadeUp}>
@@ -86,7 +86,7 @@ export default function HelpPage() {
           {/* Quick Guides */}
           <motion.div variants={fadeUp}>
             <h2 className="text-lg font-semibold font-display text-text-primary mb-4">Getting Started</h2>
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {guides.map((guide) => (
                 <Card key={guide.title} className="h-full">
                   <div className="flex items-start gap-4">
@@ -123,7 +123,7 @@ export default function HelpPage() {
           {/* Contact Support */}
           <motion.div variants={fadeUp}>
             <Card className="border-accent-blue/20">
-              <div className="flex items-start gap-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
                 <div className="w-12 h-12 rounded-xl bg-accent-blue/10 flex items-center justify-center flex-shrink-0">
                   <MessageSquare size={22} className="text-accent-blue" />
                 </div>

@@ -29,7 +29,7 @@ export default function AdminServer() {
     <div className="min-h-screen bg-bg-primary">
       <AdminSidebar />
 
-      <main className={`p-8 transition-all duration-300 ${isSidebarCollapsed ? 'ml-[92px]' : 'ml-[260px]'}`}>
+      <main className={`px-4 py-6 pb-28 sm:px-6 md:p-8 md:pb-8 transition-all duration-300 ${isSidebarCollapsed ? 'md:ml-[92px]' : 'md:ml-[260px]'}`}>
         <motion.div variants={container} initial="initial" animate="animate" className="space-y-6">
           <motion.div variants={fadeUp}>
             <h1 className="text-2xl font-display font-bold text-text-primary">Server Status</h1>
@@ -44,7 +44,7 @@ export default function AdminServer() {
             </motion.p>
           )}
 
-          <motion.div variants={fadeUp} className="grid grid-cols-2 gap-4">
+          <motion.div variants={fadeUp} className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {(serverStatus?.resources || []).map((resource) => (
               <Card key={resource.label} hover={false}>
                 <div className="flex items-center gap-3 mb-3">
@@ -73,31 +73,33 @@ export default function AdminServer() {
               <h3 className="text-lg font-semibold font-display text-text-primary mb-4">
                 Services
               </h3>
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-border-color">
-                    <th className="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase tracking-wider">Service</th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase tracking-wider">Status</th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase tracking-wider">Uptime</th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase tracking-wider">Port</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(serverStatus?.services || []).map((service) => (
-                    <tr key={service.name} className="border-b border-border-color/50 hover:bg-bg-glass/50 transition-colors">
-                      <td className="py-3 px-4 text-sm text-text-primary">{service.name}</td>
-                      <td className="py-3 px-4">
-                        <span className={`flex items-center gap-1.5 text-xs font-medium ${service.status === 'running' ? 'text-accent-green' : 'text-accent-red'}`}>
-                          <CheckCircle size={12} />
-                          {service.status}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-sm text-text-secondary">{service.uptime}</td>
-                      <td className="py-3 px-4 text-sm text-text-muted font-mono">{service.port}</td>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[640px]">
+                  <thead>
+                    <tr className="border-b border-border-color">
+                      <th className="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase tracking-wider">Service</th>
+                      <th className="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase tracking-wider">Status</th>
+                      <th className="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase tracking-wider">Uptime</th>
+                      <th className="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase tracking-wider">Port</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {(serverStatus?.services || []).map((service) => (
+                      <tr key={service.name} className="border-b border-border-color/50 hover:bg-bg-glass/50 transition-colors">
+                        <td className="py-3 px-4 text-sm text-text-primary">{service.name}</td>
+                        <td className="py-3 px-4">
+                          <span className={`flex items-center gap-1.5 text-xs font-medium ${service.status === 'running' ? 'text-accent-green' : 'text-accent-red'}`}>
+                            <CheckCircle size={12} />
+                            {service.status}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-sm text-text-secondary">{service.uptime}</td>
+                        <td className="py-3 px-4 text-sm text-text-muted font-mono">{service.port}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </Card>
           </motion.div>
 
@@ -108,10 +110,10 @@ export default function AdminServer() {
               </h3>
               <div className="space-y-2 font-mono text-xs">
                 {(serverStatus?.logs || []).map((log, index) => (
-                  <div key={`${log.time}-${index}`} className="flex gap-4 px-3 py-2 rounded-lg bg-bg-primary/50">
+                  <div key={`${log.time}-${index}`} className="flex min-w-0 flex-col gap-1 px-3 py-2 rounded-lg bg-bg-primary/50 sm:flex-row sm:gap-4">
                     <span className="text-text-muted flex-shrink-0">{log.time}</span>
                     <span className={`flex-shrink-0 w-12 ${levelColors[log.level] || 'text-text-muted'}`}>{log.level}</span>
-                    <span className="text-text-secondary">{log.message}</span>
+                    <span className="break-words text-text-secondary">{log.message}</span>
                   </div>
                 ))}
               </div>

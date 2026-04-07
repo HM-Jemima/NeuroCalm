@@ -91,13 +91,13 @@ export default function ReportsPage() {
     <div className="min-h-screen bg-bg-primary">
       <Sidebar />
 
-      <main className={`p-8 transition-all duration-300 ${isSidebarCollapsed ? 'ml-[92px]' : 'ml-[260px]'}`}>
+      <main className={`px-4 py-6 pb-28 sm:px-6 md:p-8 md:pb-8 transition-all duration-300 ${isSidebarCollapsed ? 'md:ml-[92px]' : 'md:ml-[260px]'}`}>
         <motion.div
           initial="initial"
           animate="animate"
           className="space-y-6"
         >
-          <motion.div variants={fadeUp} className="flex items-center justify-between">
+          <motion.div variants={fadeUp} className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-2xl font-display font-bold text-text-primary">Reports</h1>
               <p className="text-sm text-text-secondary mt-1">
@@ -110,7 +110,7 @@ export default function ReportsPage() {
             </Button>
           </motion.div>
 
-          <motion.div variants={fadeUp} className="grid grid-cols-4 gap-4">
+          <motion.div variants={fadeUp} className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {summaryStats.map((stat) => (
               <Card key={stat.label} hover={false} className="!p-4">
                 <div className="flex items-center gap-3">
@@ -126,7 +126,7 @@ export default function ReportsPage() {
             ))}
           </motion.div>
 
-          <motion.div variants={fadeUp} className="flex gap-2">
+          <motion.div variants={fadeUp} className="flex gap-2 overflow-x-auto pb-1">
             {[
               { id: 'all', label: 'All Reports' },
               ...getStressLevelOptions().map((level) => ({
@@ -168,14 +168,14 @@ export default function ReportsPage() {
 
               return (
                 <Card key={report.id} className="!p-5">
-                  <div className="flex items-start gap-5">
+                  <div className="flex flex-col gap-5 lg:flex-row lg:items-start">
                     <div className={`w-12 h-12 rounded-xl ${config.color} flex items-center justify-center shrink-0`}>
                       <LevelIcon size={22} />
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-1">
-                        <h3 className="text-base font-semibold text-text-primary">{report.filename || report.file_name}</h3>
+                      <div className="flex flex-wrap items-center gap-3 mb-1">
+                        <h3 className="min-w-0 break-words text-base font-semibold text-text-primary">{report.filename || report.file_name}</h3>
                         <Badge variant={['Very Relaxed', 'Relaxed'].includes(level.label) ? 'success' : 'default'} className="text-[10px] py-0.5">
                           {level.label}
                         </Badge>
@@ -184,7 +184,7 @@ export default function ReportsPage() {
                         Stress score {score}/100 with {report.confidence ?? '--'}% confidence. Export JSON or PDF for the full report.
                       </p>
 
-                      <div className="flex items-center gap-6 text-xs text-text-muted">
+                      <div className="flex flex-wrap items-center gap-3 text-xs text-text-muted sm:gap-6">
                         <span className="flex items-center gap-1.5">
                           <Calendar size={12} />
                           {formatDate(report.created_at || report.date)}
@@ -197,7 +197,7 @@ export default function ReportsPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex flex-wrap items-center gap-2 shrink-0">
                       <button
                         onClick={() => downloadReportPdf(report.id, report)}
                         className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border-color text-sm text-text-secondary hover:border-accent-blue hover:text-accent-blue transition-all"
@@ -242,13 +242,13 @@ export default function ReportsPage() {
 
           return (
             <div className="space-y-6">
-              <div className="flex items-start gap-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
                 <div className={`w-12 h-12 rounded-xl ${config.color} flex items-center justify-center shrink-0`}>
                   <LevelIcon size={22} />
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-1">
-                    <h3 className="text-lg font-semibold font-display text-text-primary">{viewReport.filename || viewReport.file_name}</h3>
+                  <div className="flex flex-wrap items-center gap-3 mb-1">
+                    <h3 className="min-w-0 break-words text-lg font-semibold font-display text-text-primary">{viewReport.filename || viewReport.file_name}</h3>
                     <Badge variant={['Very Relaxed', 'Relaxed'].includes(level.label) ? 'success' : 'default'} className="text-[10px] py-0.5">
                       {level.label}
                     </Badge>
@@ -259,7 +259,7 @@ export default function ReportsPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <Card hover={false}>
                   <h4 className="text-sm font-medium text-text-muted mb-4 uppercase tracking-wider">
                     Stress Analysis
@@ -274,7 +274,7 @@ export default function ReportsPage() {
                 </Card>
               </div>
 
-              <div className="flex items-center gap-6 text-sm text-text-secondary border-t border-border-color pt-4">
+              <div className="flex flex-col gap-2 text-sm text-text-secondary border-t border-border-color pt-4 sm:flex-row sm:items-center sm:gap-6">
                 <span className="flex items-center gap-2">
                   <Calendar size={14} className="text-text-muted" />
                   {formatDate(viewReport.created_at || viewReport.date)}
@@ -282,7 +282,7 @@ export default function ReportsPage() {
                 <span>{viewReport.user_name || 'Unknown user'}</span>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <button
                   onClick={() => downloadReportPdf(viewReport.id, viewReport)}
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-border-color text-sm text-text-secondary hover:border-accent-blue hover:text-accent-blue transition-all"

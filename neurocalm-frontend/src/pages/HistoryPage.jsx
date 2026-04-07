@@ -145,7 +145,7 @@ export default function HistoryPage() {
     <div className="min-h-screen bg-bg-primary">
       <Sidebar />
 
-      <main className={`p-8 transition-all duration-300 ${isSidebarCollapsed ? 'ml-[92px]' : 'ml-[260px]'}`}>
+      <main className={`px-4 py-6 pb-28 sm:px-6 md:p-8 md:pb-8 transition-all duration-300 ${isSidebarCollapsed ? 'md:ml-[92px]' : 'md:ml-[260px]'}`}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -160,8 +160,8 @@ export default function HistoryPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1 max-w-sm">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+            <div className="relative w-full sm:max-w-sm">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
               <input
                 value={search}
@@ -172,7 +172,7 @@ export default function HistoryPage() {
             </div>
             <button
               onClick={() => setShowFilters((value) => !value)}
-              className={`flex items-center gap-2 px-4 py-2.5 bg-bg-glass border rounded-xl text-sm transition-all ${
+              className={`flex w-full items-center justify-center gap-2 px-4 py-2.5 bg-bg-glass border rounded-xl text-sm transition-all sm:w-auto ${
                 showFilters || activeFilterCount > 0
                   ? 'border-accent-blue/40 text-accent-blue'
                   : 'border-border-color text-text-secondary hover:border-accent-blue/30'
@@ -194,7 +194,7 @@ export default function HistoryPage() {
               animate={{ opacity: 1, y: 0 }}
             >
               <Card hover={false}>
-                <div className="flex flex-wrap items-start gap-6">
+                <div className="flex flex-col items-stretch gap-6 sm:flex-row sm:flex-wrap sm:items-start">
                   <div className="space-y-3">
                     <p className="text-[11px] uppercase tracking-wider text-text-muted">Result</p>
                     <div className="flex flex-wrap gap-2">
@@ -258,7 +258,7 @@ export default function HistoryPage() {
                       setDateFilter('all');
                       setFileTypeFilter('all');
                     }}
-                    className="ml-auto inline-flex items-center gap-2 rounded-xl border border-border-color px-3 py-2 text-sm text-text-secondary transition-all hover:border-accent-blue/30 hover:text-text-primary"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-border-color px-3 py-2 text-sm text-text-secondary transition-all hover:border-accent-blue/30 hover:text-text-primary sm:ml-auto"
                   >
                     <X size={14} />
                     Clear filters
@@ -268,7 +268,7 @@ export default function HistoryPage() {
             </motion.div>
           )}
 
-          <div className="flex items-center justify-between px-1">
+          <div className="flex flex-col gap-2 px-1 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-text-secondary">
               Showing <span className="font-semibold text-text-primary">{filteredHistory.length}</span> of{' '}
               <span className="font-semibold text-text-primary">{history.length}</span> analyses
@@ -308,13 +308,13 @@ export default function HistoryPage() {
       >
         {selected && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between px-1">
-              <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-4 px-1 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-center gap-3">
                 <div className="w-10 h-10 bg-accent-blue/10 rounded-xl flex items-center justify-center">
                   <FileText size={18} className="text-accent-blue" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-text-primary">
+                  <p className="text-sm font-semibold text-text-primary break-words">
                     {selected.filename || selected.file_name}
                   </p>
                   <p className="text-xs text-text-muted">
@@ -331,7 +331,7 @@ export default function HistoryPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               <div>
                 <h4 className="text-sm font-medium text-text-muted mb-4 uppercase tracking-wider">
                   Stress Analysis

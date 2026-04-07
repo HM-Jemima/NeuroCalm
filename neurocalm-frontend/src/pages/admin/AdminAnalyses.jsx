@@ -46,13 +46,13 @@ export default function AdminAnalyses() {
     <div className="min-h-screen bg-bg-primary">
       <AdminSidebar />
 
-      <main className={`p-8 transition-all duration-300 ${isSidebarCollapsed ? 'ml-[92px]' : 'ml-[260px]'}`}>
+      <main className={`px-4 py-6 pb-28 sm:px-6 md:p-8 md:pb-8 transition-all duration-300 ${isSidebarCollapsed ? 'md:ml-[92px]' : 'md:ml-[260px]'}`}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="space-y-6"
         >
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-2xl font-display font-bold text-text-primary">Analyses</h1>
               <p className="text-sm text-text-secondary mt-1">
@@ -65,8 +65,8 @@ export default function AdminAnalyses() {
             </Button>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1 max-w-sm">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-4">
+            <div className="relative w-full lg:max-w-sm">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
               <input
                 value={search}
@@ -75,7 +75,7 @@ export default function AdminAnalyses() {
                 className="w-full pl-9 pr-4 py-2.5 bg-bg-glass border border-border-color rounded-xl text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-blue"
               />
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 overflow-x-auto pb-1">
               {resultFilters.map((value) => (
                 <button
                   key={value}
@@ -103,7 +103,7 @@ export default function AdminAnalyses() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="w-full min-w-[760px]">
                   <thead>
                     <tr className="border-b border-border-color">
                       <th className="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase tracking-wider">ID</th>

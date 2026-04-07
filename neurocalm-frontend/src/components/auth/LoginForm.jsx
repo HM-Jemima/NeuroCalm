@@ -54,7 +54,7 @@ export default function LoginForm({ onSubmit, isLoading }) {
         </button>
       </div>
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <label className="flex items-center gap-2 cursor-pointer">
           <input type="checkbox" className="w-4 h-4 rounded accent-accent-blue" />
           <span className="text-sm text-text-secondary">Remember me</span>

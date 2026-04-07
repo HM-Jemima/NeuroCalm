@@ -55,7 +55,7 @@ export default function AdminDashboard() {
       <AdminSidebar />
 
       {/* Main Content */}
-      <main className={`p-8 transition-all duration-300 ${isSidebarCollapsed ? 'ml-[92px]' : 'ml-[260px]'}`}>
+      <main className={`px-4 py-6 pb-28 sm:px-6 md:p-8 md:pb-8 transition-all duration-300 ${isSidebarCollapsed ? 'md:ml-[92px]' : 'md:ml-[260px]'}`}>
         <motion.div variants={container} initial="initial" animate="animate" className="space-y-8">
           {/* Header */}
           <motion.div variants={fadeUp}>
@@ -72,7 +72,7 @@ export default function AdminDashboard() {
           )}
 
           {/* Stats Grid */}
-          <motion.div variants={fadeUp} className="grid grid-cols-4 gap-4">
+          <motion.div variants={fadeUp} className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <StatsCard
               icon={Users}
               label="Total Users"
@@ -108,12 +108,12 @@ export default function AdminDashboard() {
           </motion.div>
 
           {/* Main Grid */}
-          <motion.div variants={fadeUp} className="grid grid-cols-[1fr_400px] gap-6">
+          <motion.div variants={fadeUp} className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_400px]">
             {/* Left Column */}
             <div className="space-y-6">
               {/* Upload Zone */}
               <Card hover={false}>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
                   <h3 className="text-lg font-semibold font-display text-text-primary">
                     Quick Analysis
                   </h3>
@@ -139,7 +139,7 @@ export default function AdminDashboard() {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="grid grid-cols-2 gap-4"
+                  className="grid grid-cols-1 gap-4 xl:grid-cols-2"
                 >
                   <Card hover={false}>
                     <h3 className="text-sm font-semibold font-display text-text-primary mb-4">
@@ -157,7 +157,7 @@ export default function AdminDashboard() {
               )}
 
               <Card hover={false}>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
                   <h3 className="text-lg font-semibold font-display text-text-primary">Users</h3>
                   <button
                     type="button"
@@ -199,7 +199,7 @@ export default function AdminDashboard() {
                 <h3 className="text-lg font-semibold font-display text-text-primary mb-4">
                   Quick Actions
                 </h3>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
                   {quickActions.map((action) => (
                     <button
                       key={action.label}

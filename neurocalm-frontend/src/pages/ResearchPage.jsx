@@ -89,7 +89,7 @@ export default function ResearchPage() {
 
       {/* Hero */}
       <section className="relative z-10 pt-32 pb-16">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div
             variants={container}
             initial="initial"
@@ -105,7 +105,7 @@ export default function ResearchPage() {
 
             <motion.h1
               variants={fadeUp}
-              className="text-5xl md:text-[64px] font-display font-bold leading-tight mb-6"
+              className="text-4xl sm:text-5xl md:text-[64px] font-display font-bold leading-tight mb-6"
             >
               The Science Behind{' '}
               <span className="gradient-text">NeuroCalm</span>
@@ -121,7 +121,7 @@ export default function ResearchPage() {
 
       {/* Research Areas */}
       <section className="relative z-10 py-24">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -129,7 +129,7 @@ export default function ResearchPage() {
             className="text-center mb-16"
           >
             <Badge className="mb-4">Core Areas</Badge>
-            <h2 className="text-4xl font-display font-bold mb-4">
+            <h2 className="text-3xl sm:text-4xl font-display font-bold mb-4">
               Research foundations
             </h2>
             <p className="text-text-secondary max-w-md mx-auto">
@@ -163,7 +163,7 @@ export default function ResearchPage() {
 
       {/* Brain Wave Bands */}
       <section className="relative z-10 py-24 bg-bg-secondary/30">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -174,7 +174,7 @@ export default function ResearchPage() {
               <Activity size={14} />
               EEG Frequency Bands
             </Badge>
-            <h2 className="text-4xl font-display font-bold mb-4">
+            <h2 className="text-3xl sm:text-4xl font-display font-bold mb-4">
               Understanding brain waves
             </h2>
             <p className="text-text-secondary max-w-md mx-auto">
@@ -208,7 +208,7 @@ export default function ResearchPage() {
 
       {/* Publications */}
       <section className="relative z-10 py-24">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -219,7 +219,7 @@ export default function ResearchPage() {
               <FileText size={14} />
               Publications
             </Badge>
-            <h2 className="text-4xl font-display font-bold mb-4">
+            <h2 className="text-3xl sm:text-4xl font-display font-bold mb-4">
               Our work
             </h2>
             <p className="text-text-secondary max-w-md mx-auto">
@@ -237,7 +237,7 @@ export default function ResearchPage() {
             {publications.map((pub) => (
               <motion.div key={pub.title} variants={fadeUp}>
                 <Card>
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <h3 className="text-base font-semibold font-display text-text-primary mb-1">
                         {pub.title}
@@ -260,7 +260,7 @@ export default function ResearchPage() {
 
       {/* Methodology Highlights */}
       <section className="relative z-10 py-24 bg-bg-secondary/30">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -271,7 +271,7 @@ export default function ResearchPage() {
               <Lightbulb size={14} />
               Methodology
             </Badge>
-            <h2 className="text-4xl font-display font-bold mb-4">
+            <h2 className="text-3xl sm:text-4xl font-display font-bold mb-4">
               How our model works
             </h2>
             <p className="text-text-secondary max-w-md mx-auto">
@@ -312,17 +312,17 @@ export default function ResearchPage() {
 
       {/* CTA */}
       <section className="relative z-10 py-24">
-        <div className="max-w-3xl mx-auto px-6">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
           >
-            <Card className="text-center p-12 border-accent-blue/20">
+            <Card className="text-center p-6 border-accent-blue/20 sm:p-12">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent-blue to-accent-purple flex items-center justify-center mx-auto mb-6">
                 <Brain size={28} className="text-white" />
               </div>
-              <h2 className="text-3xl font-display font-bold mb-4">
+              <h2 className="text-2xl sm:text-3xl font-display font-bold mb-4">
                 Experience the research firsthand
               </h2>
               <p className="text-text-secondary mb-8 max-w-md mx-auto">
