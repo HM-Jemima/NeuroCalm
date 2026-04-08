@@ -254,6 +254,7 @@ FRONTEND_URL=https://your-frontend.vercel.app
 CORS_ORIGINS=https://your-frontend.vercel.app,http://localhost:5173
 MODEL_PATH=model/SALIENT_model.h5
 MODEL_TYPE=SALIENT
+MODEL_LOAD_MODE=background
 SCALER_PATH=model/SALIENT_scaler.pkl
 MODEL_METADATA_PATH=model/deploy_metadata.json
 WINDOW_SIZE=150
